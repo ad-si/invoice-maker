@@ -1,98 +1,36 @@
 'use strict'
 
-let stream = require('stream')
-let Yaml2json = require('@adius/yaml2json')
-let template = require('./template.js')
-let me = require('./me.json')
+const fs = require('fs')
+const path = require('path')
+const stream = require('stream')
+const yaml = require('js-yaml')
+const Tabledown = require('tabledown').default
+const Yaml2json = require('@adius/yaml2json')
+const templates = {
+	de: require('./templates/de.js'),
+	en: require('./templates/en.js'),
+}
+const billerFilePath = path.join(__dirname, 'biller.yaml')
+const biller = yaml.safeLoad(fs.readFileSync(billerFilePath))
+const alignments = {
+	number: 'right',
+	date: 'center',
+	description: 'left',
+	'duration (min)': 'right',
+	'price (€)': 'right',
+}
 
 
-function buildTaskTable (tasks) {
-	let returnString = ''
-
-	tasks = tasks.map((task, index) => {
-		return {
-			number: index + 1,
-			date: task.date
-				.toISOString()
-				.substr(0,10),
-			description: task.description
-		}
-	})
-
-	let headerFields = Object.keys(
-		tasks.reduce(
-			(object, current) => {
-				Object.keys(current)
-					.forEach(key => object[key] = true)
-				return object
-			},
-			{}
-		)
-	)
-
-
-	let maxFieldLengths = tasks
-		.reduce(
-			(maxFieldLengths, task) => {
-				headerFields.forEach(field => {
-					if (task.hasOwnProperty(field)) {
-						let fieldLength = String(task[field]).length
-
-						if (!maxFieldLengths[field])
-							maxFieldLengths[field] = 0
-
-						if (fieldLength > maxFieldLengths[field]) {
-							maxFieldLengths[field] = fieldLength
-						}
-					}
-				})
-				return maxFieldLengths
-			},
-			headerFields.reduce(
-				(headerFieldLength, field) => {
-					headerFieldLength[field] = String(field).length
-					return headerFieldLength
-				},
-				{}
-			)
-		)
-
-	let paddedHeaderFields = headerFields.map(field => {
-		return field + ' '.repeat(
-			maxFieldLengths[field] - String(field).length
-		)
-	})
-
-	tasks = tasks.map(task => {
-		headerFields.forEach((field, index) => {
-			if (task.hasOwnProperty(field)) {
-				let fieldLength = String(task[field]).length
-				task[field] += ' '
-					.repeat(maxFieldLengths[field] - fieldLength)
-			}
-		})
-		return task
-	})
-
-	returnString += paddedHeaderFields.join(' ') + '\n'
-
-	returnString += paddedHeaderFields
-		.map(field => '-'.repeat(field.length))
-		.join(' ')
-
-	returnString += '\n'
-
-	returnString += tasks
-		.map(task =>
-			[
-				task.number,
-				task.date,
-				task.description
-			].join(' ')
-		)
-		.join('\n')
-
-	return returnString
+function formatTask (task, index) {
+	const price = ((task.duration / 60) * 15)
+	return {
+		'number': index + 1,
+		// Replace hyphen-minus with hyphen
+		// Date: task.date.toISOString().substr(0,10).replace(/-/g, '‑'),
+		'description': task.description,
+		'duration (min)': Number.isFinite(task.duration) ? task.duration : '',
+		'price (€)': Number.isFinite(price) ? price : task.price,
+	}
 }
 
 process.stdin
@@ -104,25 +42,38 @@ process.stdin
 			done()
 		},
 		flush: function (done) {
-			this.buffer.from = me
 
-			this.buffer.date = this.buffer.id.substr(0, 10)
+			this.buffer.issuingDate = new Date()
+			this.buffer.id = this.buffer.issuingDate
+				.toISOString().substr(0, 10) + '_1'
+			this.buffer.deliveryDate = this.buffer.deliveryDate ||
+				this.buffer.issuingDate
 
-			this.buffer.dueDate = new Date(this.buffer.date)
-			this.buffer.dueDate
-				.setDate(this.buffer.dueDate.getDate() + 20)
-			this.buffer.dueDate = this.buffer.dueDate
-				.toISOString()
-				.substr(0, 10)
+			this.buffer.from = biller
 
+			this.buffer.dueDate = new Date(this.buffer.issuingDate)
+			this.buffer.dueDate.setDate(this.buffer.issuingDate.getDate() + 14)
+
+			this.buffer.language = this.buffer.language || 'en'
 
 			if (this.buffer.tasks) {
-				this.buffer.taskTable = buildTaskTable(
-					this.buffer.tasks
+				this.buffer.tasks = this.buffer.tasks
+					.reverse()
+					.map(formatTask)
+
+				this.buffer.taskTable = new Tabledown({
+					data: this.buffer.tasks,
+					capitalizeHeaders: true,
+					alignments,
+				})
+
+				this.buffer.total = this.buffer.tasks.reduce(
+					(sum, current) => sum + Number(current['price (€)']),
+					0
 				)
 			}
 
-			this.push(template(this.buffer) + '\n')
+			this.push(templates[this.buffer.language](this.buffer) + '\n')
 			done()
 		}
 	}))

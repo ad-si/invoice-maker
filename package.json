@@ -1,17 +1,22 @@
 {
-  "name": "invoices",
+  "name": "invoice-generator",
   "version": "0.0.0",
   "description": "Generate invoices",
   "main": "compile.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "make"
   },
   "keywords": [
-    "invoice"
+    "invoice",
+    "generator"
   ],
   "author": "Adrian Sieber",
   "license": "UNLICENSED",
+  "private": "true",
   "dependencies": {
-    "@adius/yaml2json": "^0.1.2"
+    "@adius/yaml2json": "^0.1.2",
+    "js-yaml": "^3.5.5",
+    "tabledown": "^0.2.0"
   }
 }
