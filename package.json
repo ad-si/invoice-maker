@@ -1,6 +1,6 @@
 {
   "name": "invoice-maker",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Generate invoices from YAML files",
   "main": "source/compile.js",
   "bin": "source/cli.js",
