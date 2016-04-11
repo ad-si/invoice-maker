@@ -1,19 +1,19 @@
-# Invoice Generator
+# Invoice Maker
 
-Generate beautiful invoices from YAML files
+Generate beautiful invoices from YAML files.
 
 
 ## Installation
 
 ```
-npm install --global invoice-generator
+npm install --global invoice-maker
 ```
 
 
 ## Usage
 
 ```shell
-invoice-generator \
+invoice-maker \
 	--biller biller.yaml \
 	--recipient recipient.yaml \
 	--data invoice.yaml \

@@ -1,12 +1,12 @@
 {
-  "name": "invoice-generator",
+  "name": "invoice-maker",
   "version": "0.0.0",
-  "description": "Generate invoices",
+  "description": "Generate invoices from YAML files",
   "main": "source/compile.js",
   "bin": "source/cli.js",
   "scripts": {
     "test": "node tests/cli.js",
-    "prepublish" "npm test"
+    "prepublish": "npm test"
   },
   "keywords": [
     "invoice",

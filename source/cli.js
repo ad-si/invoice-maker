@@ -16,7 +16,7 @@ const argv = yargsParser(process.argv.slice(2))
 
 if (!argv.biller || !argv.recipient || !argv.data || !argv.output) {
 	console.error(
-		'Usage: invoice-generator ' +
+		'Usage: invoice-maker ' +
 		'--biller <*.yaml> ' +
 		'--recipient <*.yaml> ' +
 		'--data <*.yaml> ' +
