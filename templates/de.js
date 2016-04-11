@@ -1,6 +1,15 @@
-module.exports = (invoice) =>
+module.exports = (invoice) => {
 
-`---
+	const billerUstId = invoice.from['umsatzsteuer-identifikationsnummer']
+	const recipientUstId = invoice.to['umsatzsteuer-identifikationsnummer']
+
+	if (!billerUstId) {
+		throw new Error(
+			'The USt-IdNr of the biller is mandatory in german invoices'
+		)
+	}
+
+	return `---
 title: Rechnung
 geometry: margin=2cm
 ---
@@ -18,7 +27,10 @@ Lieferdatum:
 ## Rechnungssteller
 
 ${invoice.from.name}
-([${invoice.from.emails[0]}](mailto:${invoice.from.emails[0]}))
+${(Array.isArray(invoice.from.emails)) ?
+	`([${invoice.from.emails[0]}](mailto:${invoice.from.emails[0]}))` :
+	''
+}
 
 ${invoice.from.job}
 
@@ -27,8 +39,7 @@ ${invoice.from.address.zip} ${invoice.from.address.city},
 ${invoice.from.address.street} ${invoice.from.address.number}\
 ${invoice.from.address.flat ? ('/' + invoice.from.address.flat) : ''}
 
-Umsatzsteuer-Identifikationsnummer:
-${invoice.from['umsatzsteuer-identifikationsnummer']}
+Umsatzsteuer-Identifikationsnummer: ${billerUstId}
 
 
 ## Rechnungsempfänger
@@ -39,8 +50,8 @@ ${invoice.to.address.country},
 ${invoice.to.address.zip} ${invoice.to.address.city},
 ${invoice.to.address.street} ${invoice.to.address.number}
 
-Umsatzsteuer-Identifikationsnummer:
-${invoice.to['umsatzsteuer-identifikationsnummer']}
+
+${recipientUstId ? 'Umsatzsteuer-Identifikationsnummer: ' + recipientUstId : ''}
 
 
 ## Leistungen
@@ -49,11 +60,15 @@ ${invoice.taskTable}
 
 **Gesamtbetrag: ${invoice.total} €**
 
+
+${invoice.from.smallBusiness ?
+	'Gemäß § 19 UStG ist in dem ausgewiesenen Betrag ' +
+	'keine Umsatzsteuer enthalten.\n' +
+	'&nbsp;' :
+	''
+}
+
 &nbsp;
-
-
-Gemäß § 19 UStG ist in dem ausgewiesenen Betrag
-keine Umsatzsteuer enthalten.
 
 Bitte überweisen sie den Betrag bis
 ${invoice.dueDate.toISOString().substr(0, 10)} auf folgendes Konto:
@@ -72,3 +87,4 @@ Mit freundlichen Grüßen,
 
 ${invoice.from.name}
 `
+}

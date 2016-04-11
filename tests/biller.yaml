@@ -1,0 +1,11 @@
+name: Scrooge McDuck
+job: Treasure Hunter
+address:
+  country: Disneyland
+  city: Duckburg
+  zip: 123456
+  street: Killmotor Hill
+  number: 1
+vatin: DL1234567
+iban: DL12 3456 7890 1234 56
+smallBusiness: false

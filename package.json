@@ -2,10 +2,11 @@
   "name": "invoice-generator",
   "version": "0.0.0",
   "description": "Generate invoices",
-  "main": "compile.js",
+  "main": "source/compile.js",
+  "bin": "source/cli.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "make"
+    "test": "node tests/cli.js",
+    "prepublish" "npm test"
   },
   "keywords": [
     "invoice",
@@ -16,7 +17,9 @@
   "private": "true",
   "dependencies": {
     "@adius/yaml2json": "^0.1.2",
+    "fs-promise": "^0.5.0",
     "js-yaml": "^3.5.5",
-    "tabledown": "^0.3.0"
+    "tabledown": "^0.3.0",
+    "yargs-parser": "^2.4.0"
   }
 }

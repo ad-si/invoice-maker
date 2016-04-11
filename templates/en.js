@@ -18,7 +18,10 @@ Delivery Date:
 ## Biller
 
 ${invoice.from.name}
-([${invoice.from.emails[0]}](mailto:${invoice.from.emails[0]}))
+${(Array.isArray(invoice.from.emails)) ?
+	`([${invoice.from.emails[0]}](mailto:${invoice.from.emails[0]}))` :
+	''
+}
 
 ${invoice.from.job}
 
@@ -27,8 +30,7 @@ ${invoice.from.address.zip} ${invoice.from.address.city},
 ${invoice.from.address.street} ${invoice.from.address.number}\
 ${invoice.from.address.flat ? ('/' + invoice.from.address.flat) : ''}
 
-Tax ID number:
-: ${invoice.from['umsatzsteuer-identifikationsnummer']}
+${invoice.from.vatin ? 'Tax ID Number: ' + invoice.from.vatin : ''}
 
 
 ## Invoice Recipient
@@ -39,23 +41,25 @@ ${invoice.to.address.country},
 ${invoice.to.address.zip} ${invoice.to.address.city},
 ${invoice.to.address.street} ${invoice.to.address.number}
 
-Tax ID number:
-${invoice.to['umsatzsteuer-identifikationsnummer']}
+${invoice.to.vatin ? 'Tax ID Number: ' + invoice.to.vatin : ''}
 
 
-## Services
+## Items
 
 ${invoice.taskTable}
 
-Total amount: ${invoice.total} €
+**Total amount: ${invoice.total} $**
 
 
-According to § 19 UStG there is no sales tax liability.
+${invoice.from.smallBusiness ?
+	'The amount is without tax as this is a small business.':
+	''
+}
 
+&nbsp;
 
 Please transfer the money onto following bank account due to
 ${invoice.dueDate.toISOString().substr(0, 10)}:
-
 
 &nbsp;
 

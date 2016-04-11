@@ -1,0 +1,16 @@
+deliveryDate: 2016-04-10
+language: en
+
+items:
+  - date: 2016-04-03
+    description: Arc reactor
+    price: 1300000
+  - date: 2016-04-05
+    description: Flux capacitor
+    price: 2700000
+  - date: 2016-04-07
+    description: Lightsaber
+    price: 360000
+  - date: 2016-04-08
+    description: Sonic screwdriver
+    price: 80000
