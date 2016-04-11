@@ -24,7 +24,7 @@ ${invoice.from.job}
 
 ${invoice.from.address.country},
 ${invoice.from.address.zip} ${invoice.from.address.city},
-${invoice.from.address.street} ${invoice.from.address.number}
+${invoice.from.address.street} ${invoice.from.address.number}\
 ${invoice.from.address.flat ? ('/' + invoice.from.address.flat) : ''}
 
 Tax ID number:

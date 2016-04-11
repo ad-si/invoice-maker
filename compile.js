@@ -13,23 +13,39 @@ const templates = {
 const billerFilePath = path.join(__dirname, 'biller.yaml')
 const biller = yaml.safeLoad(fs.readFileSync(billerFilePath))
 const alignments = {
-	number: 'right',
+	number: 'center',
 	date: 'center',
 	description: 'left',
-	'duration (min)': 'right',
-	'price (€)': 'right',
+	duration: 'right',
+	price: 'right',
+}
+const headerTexts = {
+	en: {
+		number: 'Number',
+		date: 'Date',
+		description: 'Description',
+		duration: 'Duration (min)',
+		price: 'Price ($)',
+	},
+	de: {
+		number: 'Nummer',
+		date: 'Datum',
+		description: 'Beschreibung',
+		duration: 'Dauer (min)',
+		price: 'Preis (€)',
+	}
 }
 
 
 function formatTask (task, index) {
 	const price = ((task.duration / 60) * 15)
 	return {
-		'number': index + 1,
+		number: index + 1,
 		// Replace hyphen-minus with hyphen
-		// Date: task.date.toISOString().substr(0,10).replace(/-/g, '‑'),
-		'description': task.description,
-		'duration (min)': Number.isFinite(task.duration) ? task.duration : '',
-		'price (€)': Number.isFinite(price) ? price : task.price,
+		date: task.date.toISOString().substr(0,10).replace(/-/g, '‑'),
+		description: task.description,
+		duration: Number.isFinite(task.duration) ? task.duration : '',
+		price: Number.isFinite(price) ? price : task.price,
 	}
 }
 
@@ -63,12 +79,13 @@ process.stdin
 
 				this.buffer.taskTable = new Tabledown({
 					data: this.buffer.tasks,
-					capitalizeHeaders: true,
 					alignments,
+					headerTexts: headerTexts[this.buffer.language],
+					capitalizeHeaders: true,
 				})
 
 				this.buffer.total = this.buffer.tasks.reduce(
-					(sum, current) => sum + Number(current['price (€)']),
+					(sum, current) => sum + Number(current.price),
 					0
 				)
 			}

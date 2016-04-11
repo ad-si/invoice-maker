@@ -17,6 +17,6 @@
   "dependencies": {
     "@adius/yaml2json": "^0.1.2",
     "js-yaml": "^3.5.5",
-    "tabledown": "^0.2.0"
+    "tabledown": "^0.3.0"
   }
 }
