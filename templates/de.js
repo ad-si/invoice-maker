@@ -46,6 +46,8 @@ Umsatzsteuer-Identifikationsnummer: ${billerUstId}
 
 ${invoice.to.name}
 
+${invoice.to.organisation}
+
 ${invoice.to.address.country},
 ${invoice.to.address.zip} ${invoice.to.address.city},
 ${invoice.to.address.street} ${invoice.to.address.number}
