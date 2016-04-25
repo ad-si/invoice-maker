@@ -18,7 +18,7 @@ module.exports = (biller, recipient, data) => {
 	invoice.issuingDate = new Date()
 	invoice.id = invoice.issuingDate
 		.toISOString().substr(0, 10) + '_1'
-	invoice.deliveryDate = invoice.deliveryDate ||
+	invoice.deliveryDate = data.deliveryDate ||
 		invoice.issuingDate
 
 	invoice.from = biller
