@@ -70,7 +70,5 @@ ${invoice.dueDate.toISOString().substr(0, 10)}:
 &nbsp;
 
 
-Best regards,
-
-${invoice.from.name}
+Thank you for the good cooperation!
 `

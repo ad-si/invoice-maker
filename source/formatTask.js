@@ -1,5 +1,6 @@
 module.exports = (item, index) => {
-	const price = ((item.duration / 60) * 15)
+	const price = (item.duration / 60) * 15
+	
 	return {
 		number: index + 1,
 		// Replace hyphen-minus with hyphen

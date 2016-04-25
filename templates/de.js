@@ -82,9 +82,6 @@ ${invoice.dueDate.toISOString().substr(0, 10)} auf folgendes Konto:
 
 &nbsp;
 
-
-Mit freundlichen Grüßen,
-
-${invoice.from.name}
+Vielen Dank für die gute Zusammenarbeit!
 `
 }
