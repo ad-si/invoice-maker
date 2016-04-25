@@ -14,4 +14,6 @@ childProcess.exec(command, (error, stdout, stderr) => {
 	console.assert(!error, error)
 	console.assert(!stderr, stderr)
 	console.assert(!stdout, stdout)
+
+	console.log('All tests passed ✔')
 })
