@@ -39,7 +39,7 @@ ${Array.isArray(invoice.from.emails) ?
 
 ${invoice.from.job}
 
-${invoice.from.address.country ? invoice.from.address.country + ',' : ''},
+${invoice.from.address.country},
 ${invoice.from.address.zip} ${invoice.from.address.city},
 ${invoice.from.address.street} ${invoice.from.address.number}\
 ${invoice.from.address.flat ?
@@ -59,7 +59,6 @@ ${invoice.to.organisation}
 ${invoice.to.address.country},
 ${invoice.to.address.zip} ${invoice.to.address.city},
 ${invoice.to.address.street} ${invoice.to.address.number}
-
 
 ${recipientUstId ? 'Umsatzsteuer-Identifikationsnummer: ' + recipientUstId : ''}
 
@@ -98,6 +97,7 @@ ${invoice.dueDate
 **IBAN: ${invoice.from.iban}**
 
 &nbsp;
+
 
 Vielen Dank für die gute Zusammenarbeit!
 `

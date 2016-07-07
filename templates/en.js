@@ -79,6 +79,7 @@ ${invoice.dueDate
   .substr(0, 10)
 }:
 
+
 &nbsp;
 
 **${invoice.from.name}**

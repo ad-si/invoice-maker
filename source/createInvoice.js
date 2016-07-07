@@ -44,16 +44,13 @@ module.exports = (biller, recipient, data) => {
   invoice.id = invoice.issuingDate
     .toISOString()
     .substr(0, 10) + '_1'
-  invoice.deliveryDate = data.deliveryDate ||
-    invoice.issuingDate
+  invoice.deliveryDate = data.deliveryDate
+
+  invoice.dueDate = new Date(invoice.issuingDate)
+  invoice.dueDate.setDate(invoice.issuingDate.getDate() + 14)
 
   invoice.from = sanitizeContact(biller)
   invoice.to = sanitizeContact(recipient)
-
-  invoice.dueDate = new Date(invoice.issuingDate)
-  invoice.dueDate.setDate(
-    invoice.issuingDate.getDate() + 14
-  )
 
   invoice.language = data.language || 'en'
 
@@ -67,7 +64,6 @@ module.exports = (biller, recipient, data) => {
         item.price = Number.isFinite(price) ? price : item.price
         return item
       })
-      .map(formatTask)
 
     invoice.total = invoice.items
       .map(item => Number(item.price))
@@ -83,12 +79,25 @@ module.exports = (biller, recipient, data) => {
         .map(item => {
           item.price = item.price.toFixed(2)
           return item
-        }),
+        })
+        .map(formatTask),
       alignments,
       headerTexts: headerTexts[data.language],
       capitalizeHeaders: true,
     })
+
+    if (!invoice.deliveryDate) {
+      invoice.deliveryDate = invoice.items
+        .map(item => item.date)
+        .reduce(
+          (previousDate, currentDate) =>
+            previousDate > currentDate ? previousDate : currentDate,
+          '0000-00-00'
+        )
+    }
   }
+
+  invoice.deliveryDate = new Date(invoice.deliveryDate || invoice.issuingDate)
 
   return invoice
 }
