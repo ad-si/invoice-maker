@@ -1,62 +1,87 @@
 #! /usr/bin/env node
 
-'use strict'
-
 const path = require('path')
 const childProcess = require('child_process')
 const crypto = require('crypto')
+const nativeConsole = require('console')
+const log = new nativeConsole.Console(process.stdout, process.stderr)
 
 const fsp = require('fs-promise')
 const yaml = require('js-yaml')
 const yargsParser = require('yargs-parser')
+const untildify = require('untildify')
 
 const compileMarkdown = require('./compileMarkdown')
 
 const argv = yargsParser(process.argv.slice(2))
 
-if (!argv.biller || !argv.recipient || !argv.data || !argv.output) {
-	console.error(
-		'Usage: invoice-maker ' +
-		'--biller <*.yaml> ' +
-		'--recipient <*.yaml> ' +
-		'--data <*.yaml> ' +
-		'--output <*.pdf>'
-	)
-	process.exit(1)
-	return
+if (!argv.data) {
+  log.error(
+    `Usage: invoice-maker \\
+      [--biller <*.yaml>] \\
+      [--recipient <*.yaml>] \\
+      [--output <*.pdf>] \\
+      --data <*.yaml> `
+  )
+  process.exit(1)
 }
+else {
 
-Promise
-	.all([
-		fsp.readFile(path.resolve(argv.biller)),
-		fsp.readFile(path.resolve(argv.recipient)),
-		fsp.readFile(path.resolve(argv.data))
-	])
-	.then(yamlFileContents => {
-		const biller = yaml.safeLoad(yamlFileContents[0])
-		const recipient = yaml.safeLoad(yamlFileContents[1])
-		const data = yaml.safeLoad(yamlFileContents[2])
+  fsp
+    .readFile(path.resolve(argv.data))
+    .then(yamlFileContent => {
+      const data = yaml.safeLoad(yamlFileContent)
 
-		const markdownInvoice = compileMarkdown(biller, recipient, data)
-		const tempFileName = crypto.randomBytes(5).toString('hex') + '.tmp'
+      if (data.biller) data.biller = `~/Contacts/${data.biller}.yaml`
+      if (data.recipient) data.recipient = `~/Contacts/${data.recipient}.yaml`
 
-		fsp.writeFileSync(tempFileName, markdownInvoice)
+      if (argv.biller) data.biller = path.resolve(argv.biller)
+      if (argv.recipient) data.recipient = path.resolve(argv.recipient)
 
-		childProcess.exec(
-			`pandoc ${tempFileName}\
-				--standalone \
-				--latex-engine xelatex \
-				--out ${argv.output}`,
-			(error, stdout, stderr) => {
-				if (error || stderr) {
-					if (error) console.error(error.stack)
-					if (stderr) console.error(stderr)
-				}
-				else {
-					fsp.unlinkSync(tempFileName)
-					if (stdout) console.log(stdout)
-				}
-			}
-		)
-	})
-	.catch(error => console.error(error.stack))
+      if (!data.biller) throw new Error('Biller is not specified')
+      if (!data.recipient) throw new Error('Recipient is not specified')
+
+      return Promise
+        .all([
+          fsp.readFile(untildify(data.biller)),
+          fsp.readFile(untildify(data.recipient)),
+        ])
+        .then(yamlFileContents => {
+          const biller = yaml.safeLoad(yamlFileContents[0])
+          const recipient = yaml.safeLoad(yamlFileContents[1])
+          const markdownInvoice = compileMarkdown(biller, recipient, data)
+
+          return markdownInvoice
+        })
+    })
+    .then(markdownInvoice => {
+      if (!argv.output) {
+        log.info(markdownInvoice)
+        return
+      }
+
+      const tempFileName = crypto
+        .randomBytes(5)
+        .toString('hex') + '.tmp'
+
+      fsp.writeFileSync(tempFileName, markdownInvoice)
+
+      childProcess.exec(
+        `pandoc ${tempFileName}\
+          --standalone \
+          --latex-engine xelatex \
+          --out ${argv.output}`,
+        (error, stdout, stderr) => {
+          if (error || stderr) {
+            if (error) log.error(error.stack)
+            if (stderr) log.error(stderr)
+          }
+          else {
+            fsp.unlinkSync(tempFileName)
+            if (stdout) log.info(stdout)
+          }
+        }
+      )
+    })
+    .catch(error => log.error(error.stack))
+}

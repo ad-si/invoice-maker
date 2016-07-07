@@ -1,53 +1,94 @@
-'use strict'
-
 const Tabledown = require('tabledown').default
+
 const formatTask = require('./formatTask')
 const headerTexts = require('./headerTexts')
 const alignments = {
-	number: 'center',
-	date: 'center',
-	description: 'left',
-	duration: 'right',
-	price: 'right',
+  number: 'center',
+  date: 'center',
+  description: 'left',
+  duration: 'right',
+  price: 'right',
+}
+
+function sanitizeContact (contact) {
+
+  contact = Object.assign(
+    {
+      name: '',
+      address: {},
+    },
+    contact
+  )
+
+  if (contact.addresses) contact.address = contact.addresses[0]
+  if (contact.emails) contact.email = contact.emails[0]
+
+  contact.address = Object.assign(
+    {
+      country: '',
+      city: '',
+      zip: '',
+      street: '',
+      number: '',
+    },
+    contact.address
+  )
+
+  return contact
 }
 
 module.exports = (biller, recipient, data) => {
+  const invoice = {}
 
-	const invoice = {}
+  invoice.issuingDate = new Date()
+  invoice.id = invoice.issuingDate
+    .toISOString()
+    .substr(0, 10) + '_1'
+  invoice.deliveryDate = data.deliveryDate ||
+    invoice.issuingDate
 
-	invoice.issuingDate = new Date()
-	invoice.id = invoice.issuingDate
-		.toISOString().substr(0, 10) + '_1'
-	invoice.deliveryDate = data.deliveryDate ||
-		invoice.issuingDate
+  invoice.from = sanitizeContact(biller)
+  invoice.to = sanitizeContact(recipient)
 
-	invoice.from = biller
-	invoice.to = recipient
+  invoice.dueDate = new Date(invoice.issuingDate)
+  invoice.dueDate.setDate(
+    invoice.issuingDate.getDate() + 14
+  )
 
-	invoice.dueDate = new Date(invoice.issuingDate)
-	invoice.dueDate.setDate(
-		invoice.issuingDate.getDate() + 14
-	)
+  invoice.language = data.language || 'en'
 
-	invoice.language = data.language || 'en'
+  if (data.items) {
+    invoice.items = data.items
+      .reverse()
+      .map(item => {
+        const hourlyWage = data.hourlyWage || 20
+        const minutesPerHour = 60
+        const price = (item.duration / minutesPerHour) * hourlyWage
+        item.price = Number.isFinite(price) ? price : item.price
+        return item
+      })
+      .map(formatTask)
 
-	if (data.items) {
-		invoice.items = data.items
-			.reverse()
-			.map(formatTask)
+    invoice.total = invoice.items
+      .map(item => Number(item.price))
+      .reduce((current, next) => current + next)
+      .toFixed(2)
 
-		invoice.taskTable = new Tabledown({
-			data: invoice.items,
-			alignments,
-			headerTexts: headerTexts[data.language],
-			capitalizeHeaders: true,
-		})
+    invoice.totalDuration = invoice.items
+      .map(item => Number(item.duration))
+      .reduce((current, next) => current + next)
 
-		invoice.total = invoice.items.reduce(
-			(sum, current) => sum + Number(current.price),
-			0
-		)
-	}
+    invoice.taskTable = new Tabledown({
+      data: invoice.items
+        .map(item => {
+          item.price = item.price.toFixed(2)
+          return item
+        }),
+      alignments,
+      headerTexts: headerTexts[data.language],
+      capitalizeHeaders: true,
+    })
+  }
 
-	return invoice
+  return invoice
 }

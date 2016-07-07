@@ -1,19 +1,18 @@
-'use strict'
-
-const fs = require('fs')
+const nativeConsole = require('console')
+const log = new nativeConsole.Console(process.stdout, process.stderr)
 const childProcess = require('child_process')
 const command =
 `./source/cli.js \
-	--biller tests/biller.yaml \
-	--recipient tests/recipient.yaml \
-	--data tests/invoice.yaml \
-	--output tests/invoice.pdf
+  --biller tests/biller.yaml \
+  --recipient tests/recipient.yaml \
+  --data tests/invoice.yaml \
+  --output tests/invoice.pdf
 `
 
 childProcess.exec(command, (error, stdout, stderr) => {
-	console.assert(!error, error)
-	console.assert(!stderr, stderr)
-	console.assert(!stdout, stdout)
+  log.assert(!error, error)
+  log.assert(!stderr, stderr)
+  log.assert(!stdout, stdout)
 
-	console.log('All tests passed ✔')
+  log.log('All tests passed ✔')
 })

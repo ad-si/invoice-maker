@@ -20,5 +20,13 @@
     "js-yaml": "^3.5.5",
     "tabledown": "^0.3.0",
     "yargs-parser": "^2.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^2.10.1",
+    "javascript-styleguide": "^0.2.2"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": "./node_modules/javascript-styleguide/.eslintrc.yaml"
   }
 }
