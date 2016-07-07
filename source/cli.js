@@ -27,10 +27,18 @@ if (!argv.data) {
 }
 else {
 
+  const dataFilePath = path.resolve(argv.data)
+  const idMatch = path
+    .basename(dataFilePath)
+    .match(/^(\d{4}(-\d\d){2}_\d+)_/)
+  const invoiceId = idMatch ? idMatch[1] : null
+
   fsp
-    .readFile(path.resolve(argv.data))
+    .readFile(dataFilePath)
     .then(yamlFileContent => {
       const data = yaml.safeLoad(yamlFileContent)
+
+      data.id = invoiceId
 
       if (data.biller) data.biller = `~/Contacts/${data.biller}.yaml`
       if (data.recipient) data.recipient = `~/Contacts/${data.recipient}.yaml`

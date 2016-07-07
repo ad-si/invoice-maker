@@ -73,15 +73,12 @@ ${invoice.totalDuration ?
 
 **Gesamtbetrag: ${invoice.total} €**
 
+&nbsp;
 
 ${invoice.from.smallBusiness ?
   'Gemäß § 19 UStG ist in dem ausgewiesenen Betrag ' +
-  'keine Umsatzsteuer enthalten.\n' +
-  '&nbsp;' :
-  ''
+  'keine Umsatzsteuer enthalten.&nbsp;' : ''
 }
-
-&nbsp;
 
 Bitte überweisen sie den Betrag bis
 ${invoice.dueDate

@@ -41,7 +41,7 @@ module.exports = (biller, recipient, data) => {
   const invoice = {}
 
   invoice.issuingDate = new Date()
-  invoice.id = invoice.issuingDate
+  invoice.id = data.id || invoice.issuingDate
     .toISOString()
     .substr(0, 10) + '_1'
   invoice.deliveryDate = data.deliveryDate
@@ -71,7 +71,7 @@ module.exports = (biller, recipient, data) => {
       .toFixed(2)
 
     invoice.totalDuration = invoice.items
-      .map(item => Number(item.duration))
+      .map(item => Number(item.duration || 0))
       .reduce((current, next) => current + next)
 
     invoice.taskTable = new Tabledown({
