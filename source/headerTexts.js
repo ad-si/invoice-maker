@@ -9,7 +9,7 @@ module.exports = {
   de: {
     number: 'Nummer',
     date: 'Datum',
-    description: 'Beschreibung',
+    description: 'Beschreibung             ',
     duration: 'Dauer (min)',
     price: 'Preis (€)',
   },
