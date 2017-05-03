@@ -1,5 +1,13 @@
+const stream = require('stream')
+
 const Yaml2json = require('@adius/yaml2json')
 const formatTask = require('./formatTask')
+const Tabledown = require('tabledown').default
+
+// TODO: Remove after figuring out necessity
+const headerTexts = {}
+const templates = {}
+
 
 module.exports = (inputStream, outputStream) => {
   inputStream
@@ -14,11 +22,12 @@ module.exports = (inputStream, outputStream) => {
 
         this.buffer.issuingDate = new Date()
         this.buffer.id = this.buffer.issuingDate
-          .toISOString().substr(0, 10) + '_1'
+          .toISOString()
+          .substr(0, 10) + '_1'
         this.buffer.deliveryDate = this.buffer.deliveryDate ||
           this.buffer.issuingDate
 
-        this.buffer.from = biller
+        this.buffer.from = 'biller'
 
         this.buffer.dueDate = new Date(this.buffer.issuingDate)
         this.buffer.dueDate.setDate(
@@ -26,8 +35,6 @@ module.exports = (inputStream, outputStream) => {
         )
 
         this.buffer.language = this.buffer.language || 'en'
-
-        console.log(this.buffer)
 
 
         if (this.buffer.tasks) {
@@ -37,7 +44,7 @@ module.exports = (inputStream, outputStream) => {
 
           this.buffer.taskTable = new Tabledown({
             data: this.buffer.tasks,
-            alignments,
+            // alignments,
             headerTexts: headerTexts[this.buffer.language],
             capitalizeHeaders: true,
           })
@@ -50,7 +57,7 @@ module.exports = (inputStream, outputStream) => {
 
         this.push(templates[this.buffer.language](this.buffer) + '\n')
         done()
-      }
+      },
     }))
     .pipe(outputStream)
 }

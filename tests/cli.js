@@ -6,6 +6,7 @@ const command =
   --biller tests/biller.yaml \
   --recipient tests/recipient.yaml \
   --data tests/invoice.yaml \
+  --logo images/wordmark.png \
   --output tests/invoice.pdf
 `
 

@@ -2,25 +2,31 @@
 
 Generate beautiful invoices from YAML files.
 
+[![Example invoice](./images/example-invoice.png)](./tests/invoice.pdf)
+
 
 ## Installation
 
-```
+```sh
 npm install --global invoice-maker
+```
+
+or
+
+```sh
+yarn global add invoice-maker
 ```
 
 
 ## Usage
 
-```shell
+```sh
 invoice-maker \
-	--biller biller.yaml \
-	--recipient recipient.yaml \
-	--data invoice.yaml \
-	--output invoice.pdf
+  --biller tests/biller.yaml \
+  --recipient tests/recipient.yaml \
+  --data tests/invoice.yaml \
+  --logo images/wordmark.png \
+  --output invoice.pdf
 ```
 
 Checkout the [tests](./tests) directory for example files.
-
-
-![Example invoice](./examples/invoice.png)

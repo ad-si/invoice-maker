@@ -8,90 +8,103 @@ module.exports = (invoice) => {
     )
   }
 
-  return `---
-title: Rechnung
-geometry: margin=2cm
+  return `
+---
+title: \\vspace{-5ex} Rechnung
 ---
 
-Rechnungsnummer:
-: ${invoice.id}
+----------------- -----------------
+ Rechnungsnummer: ${invoice.id}
 
-Austellungsdatum:
-: ${invoice.issuingDate
-  .toISOString()
-  .substr(0, 10)
-}
+Austellungsdatum: ${invoice.issuingDate
+                    .toISOString()
+                    .substr(0, 10)}
 
-Lieferdatum:
-: ${invoice.deliveryDate
-  .toISOString()
-  .substr(0, 10)
-}
+     Lieferdatum: ${invoice.deliveryDate
+                    .toISOString()
+                    .substr(0, 10)}
+-----------------------------------
 
+&nbsp;
+&nbsp;
 
-## Rechnungssteller
+\\begin{multicols}{2}
 
-${invoice.from.name}
-${Array.isArray(invoice.from.emails) ?
-  `([${invoice.from.emails[0]}](mailto:${invoice.from.emails[0]}))` :
-  ''
-}
+  \\subsection{Rechnungsempfänger}
 
-${invoice.from.job}
+  ${invoice.to.name} \\\\
+  ${invoice.to.organization} \\\\
+  ${invoice.to.address.country},
+  ${invoice.to.address.city} ${invoice.to.address.zip},
+  ${invoice.to.address.street} ${invoice.to.address.number} \\\\
+  ${recipientUstId ? 'USt-IdNr.: ' + recipientUstId : ''}
 
-${invoice.from.address.country},
-${invoice.from.address.zip} ${invoice.from.address.city},
-${invoice.from.address.street} ${invoice.from.address.number}\
-${invoice.from.address.flat ?
-  '/' + invoice.from.address.flat :
-  ''
-}
+\\columnbreak
 
-Umsatzsteuer-Identifikationsnummer: ${billerUstId}
+  \\subsection{Rechnungssteller}
 
+  ${invoice.from.name}
+  ${Array.isArray(invoice.from.emails)
+    ? `(\\href{${invoice.from.emails[0]}}{${invoice.from.emails[0]}})`
+    : ''
+  } \\\\
+  ${invoice.from.job} \\\\
+  ${invoice.from.address.country},
+  ${invoice.from.address.city} ${invoice.from.address.zip},
+  ${invoice.from.address.street} ${invoice.from.address.number}\
+  ${invoice.from.address.flat
+    ? `/ ${invoice.from.address.flat}`
+    : ''
+  } \\\\
+  USt-IdNr.: ${billerUstId}
 
-## Rechnungsempfänger
-
-${invoice.to.name}
-
-${invoice.to.organisation}
-
-${invoice.to.address.country},
-${invoice.to.address.zip} ${invoice.to.address.city},
-${invoice.to.address.street} ${invoice.to.address.number}
-
-${recipientUstId ? 'Umsatzsteuer-Identifikationsnummer: ' + recipientUstId : ''}
+\\end{multicols}
 
 
 ## Leistungen
 
 ${invoice.taskTable}
 
-${invoice.totalDuration ?
-  `**Gesamtarbeitszeit: ${invoice.totalDuration} min**` : ''
+${invoice.totalDuration
+  ? `Gesamtarbeitszeit: ${invoice.totalDuration} min`
+  : ''
 }
 
-**Gesamtbetrag: ${invoice.total} €**
+${invoice.discount
+  ? `Zwischensumme: ${invoice.subTotal} €\n\n` +
+    `Rabatt von ${invoice.discount.value * 100} %
+      ${invoice.discount.reason
+        ? `(${invoice.discount.reason}):`
+        : ''
+      } \u2212${invoice.discount.amount}` // Unicode minus
+  : ''
+}
+
+\\setlength{\\fboxsep}{2mm}
+\\fbox{Gesamtbetrag: \\textbf{${invoice.total} €}}
 
 &nbsp;
 
-${invoice.from.smallBusiness ?
-  'Gemäß § 19 UStG ist in dem ausgewiesenen Betrag ' +
-  'keine Umsatzsteuer enthalten.&nbsp;' : ''
+${invoice.from.smallBusiness
+  ? 'Gemäß § 19 UStG ist in dem ausgewiesenen Betrag ' +
+    'keine Umsatzsteuer enthalten.&nbsp;'
+  : ''
 }
 
 Bitte überweisen sie den Betrag bis
-${invoice.dueDate
+**${invoice.dueDate
   .toISOString()
   .substr(0, 10)
-} auf folgendes Konto:
+}** auf folgendes Konto:
 
 
 &nbsp;
 
-**${invoice.from.name}**
+--------- ---------------------
+ Inhaber: **${invoice.from.name}**
 
-**IBAN: ${invoice.from.iban}**
+    IBAN: **${invoice.from.iban}**
+-------------------------------
 
 &nbsp;
 

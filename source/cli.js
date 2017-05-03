@@ -21,6 +21,7 @@ if (!argv.data) {
       [--biller <*.yaml>] \\
       [--recipient <*.yaml>] \\
       [--output <*.pdf>] \\
+      [--logo <*.png>] \\
       --data <*.yaml> `
   )
   process.exit(1)
@@ -49,6 +50,8 @@ else {
       if (!data.biller) throw new Error('Biller is not specified')
       if (!data.recipient) throw new Error('Recipient is not specified')
 
+      if (argv.logo) data.logoPath = path.resolve(argv.logo)
+
       return Promise
         .all([
           fsp.readFile(untildify(data.biller)),
@@ -67,10 +70,14 @@ else {
         log.info(markdownInvoice)
         return
       }
-
-      const tempFileName = crypto
-        .randomBytes(5)
-        .toString('hex') + '.tmp'
+      const timeStamp = new Date()
+        .toISOString()
+        .replace(/:/g, '')
+        .slice(0, 15)
+      const randBytes = crypto
+        .randomBytes(2)
+        .toString('hex')
+      const tempFileName =  `${timeStamp}_${randBytes}.tmp.md`
 
       fsp.writeFileSync(tempFileName, markdownInvoice)
 

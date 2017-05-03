@@ -4,11 +4,10 @@ module.exports = (item, index) => {
     {number: index + 1},
     item,
     {
-      // Replace hyphen-minus with hyphen
       date: item.date
         .toISOString()
         .substr(0, 10)
-        .replace(/-/g, '‑'),
+        .replace(/-/g, '‑'), // Replace hyphen-minus with hyphen
       description: item.description.trim(),
       duration: Number.isFinite(item.duration) ? item.duration : '',
     }
