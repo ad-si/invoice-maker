@@ -1,6 +1,21 @@
 module.exports = (invoice) => {
   const billerUstId = invoice.from['umsatzsteuer-identifikationsnummer']
   const recipientUstId = invoice.to['umsatzsteuer-identifikationsnummer']
+  const unicodeMinus = '\u2212'
+
+  // Biller newline
+  const billerAddressTooLong = Object
+    .values(invoice.from.address)
+    .join()
+    .length > 50
+  const bnl = billerAddressTooLong ? '\\\\' : ''
+
+  // Recipient newline
+  const recipientAddressTooLong = Object
+    .values(invoice.to.address)
+    .join()
+    .length > 50
+  const rnl = recipientAddressTooLong ? '\\\\' : ''
 
   if (!billerUstId) {
     throw new Error(
@@ -14,15 +29,15 @@ title: \\vspace{-5ex} Rechnung
 ---
 
 ----------------- -----------------
- Rechnungsnummer: ${invoice.id}
+ Rechnungsnummer: **${invoice.id}**
 
-Austellungsdatum: ${invoice.issuingDate
+Austellungsdatum: **${invoice.issuingDate
                     .toISOString()
-                    .substr(0, 10)}
+                    .substr(0, 10)}**
 
-     Lieferdatum: ${invoice.deliveryDate
+     Lieferdatum: **${invoice.deliveryDate
                     .toISOString()
-                    .substr(0, 10)}
+                    .substr(0, 10)}**
 -----------------------------------
 
 &nbsp;
@@ -33,11 +48,16 @@ Austellungsdatum: ${invoice.issuingDate
   \\subsection{Rechnungsempfänger}
 
   ${invoice.to.name} \\\\
-  ${invoice.to.organization} \\\\
+  ${invoice.to.organization ? `${invoice.to.organization}\\\\` : '\\'}
   ${invoice.to.address.country},
-  ${invoice.to.address.city} ${invoice.to.address.zip},
-  ${invoice.to.address.street} ${invoice.to.address.number} \\\\
-  ${recipientUstId ? 'USt-IdNr.: ' + recipientUstId : ''}
+  ${invoice.to.address.city} ${invoice.to.address.zip}, ${rnl}
+  ${invoice.to.address.street} ${invoice.to.address.number}
+  ${invoice.to.address.addition
+    ? `/ ${invoice.to.address.addition.replace('#', '\\#')}`
+    // TODO: Escape all special LaTeX characters
+    : ''
+  } \\\\
+  ${recipientUstId ? `USt-IdNr.: ${recipientUstId}` : ''}
 
 \\columnbreak
 
@@ -48,12 +68,12 @@ Austellungsdatum: ${invoice.issuingDate
     ? `(\\href{${invoice.from.emails[0]}}{${invoice.from.emails[0]}})`
     : ''
   } \\\\
-  ${invoice.from.job} \\\\
+  ${invoice.from.job ? `${invoice.from.job}\\\\` : '\\'}
   ${invoice.from.address.country},
-  ${invoice.from.address.city} ${invoice.from.address.zip},
-  ${invoice.from.address.street} ${invoice.from.address.number}\
-  ${invoice.from.address.flat
-    ? `/ ${invoice.from.address.flat}`
+  ${invoice.from.address.city} ${invoice.from.address.zip}, ${bnl}
+  ${invoice.from.address.street} ${invoice.from.address.number}
+  ${invoice.from.address.addition
+    ? `/ ${invoice.from.address.addition.replace('#', '\\#')}`
     : ''
   } \\\\
   USt-IdNr.: ${billerUstId}
@@ -65,23 +85,39 @@ Austellungsdatum: ${invoice.issuingDate
 
 ${invoice.taskTable}
 
+
+\\begin{flushright}
+
 ${invoice.totalDuration
-  ? `Gesamtarbeitszeit: ${invoice.totalDuration} min`
+  ? `Gesamtarbeitszeit: \\textbf{${invoice.totalDuration} min}`
+  : ''
+}
+
+${invoice.discount || invoice.vat
+  ? `Zwischensumme: ${invoice.subTotal.toFixed(2)} \\euro\n\n`
   : ''
 }
 
 ${invoice.discount
-  ? `Zwischensumme: ${invoice.subTotal} €\n\n` +
-    `Rabatt von ${invoice.discount.value * 100} %
-      ${invoice.discount.reason
-        ? `(${invoice.discount.reason}):`
-        : ''
-      } \u2212${invoice.discount.amount}` // Unicode minus
+  ? `Rabatt von ${invoice.discount.value * 100} \\%
+    ${invoice.discount.reason
+      ? `(${invoice.discount.reason})`
+      : ''
+    }: ${unicodeMinus}${invoice.discount.amount.toFixed(2)}  \\euro`
   : ''
 }
 
-\\setlength{\\fboxsep}{2mm}
-\\fbox{Gesamtbetrag: \\textbf{${invoice.total} €}}
+${invoice.vat
+  ? `Umsatzsteuer von ${invoice.vat * 100} \\%: ` +
+    `${invoice.tax.toFixed(2)} \\euro`
+  : ''
+}
+
+\\setul{3mm}{0.25mm}
+\\ul{\\textbf{Gesamtbetrag: ${invoice.total.toFixed(2)} \\euro}}
+
+\\end{flushright}
+
 
 &nbsp;
 

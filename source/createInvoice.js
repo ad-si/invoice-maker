@@ -41,7 +41,6 @@ function getSubTotal (items) {
   return items
     .map(item => Number(item.price))
     .reduce((current, next) => current + next)
-    .toFixed(2)
 }
 
 function calcDeliveryDate (items) {
@@ -111,10 +110,20 @@ module.exports = (biller, recipient, data) => {
         return item
       })
 
-    invoice.subTotal = getSubTotal(invoice.items)
-    invoice.discount = data.discount || {value: 0}
-    invoice.discount.amount = invoice.subTotal * invoice.discount.value
-    invoice.total = invoice.subTotal - invoice.discount.amount
+    invoice.total = invoice.subTotal = getSubTotal(invoice.items)
+
+    if (data.discount) {
+      invoice.discount = data.discount
+      invoice.discount.amount = invoice.subTotal * invoice.discount.value
+      invoice.total -= invoice.discount.amount
+    }
+
+    if (data.vat) {
+      invoice.vat = data.vat
+      invoice.tax = invoice.total * invoice.vat
+      invoice.total += invoice.tax
+    }
+
     invoice.logoPath = data.logoPath
 
     invoice.totalDuration = invoice.items

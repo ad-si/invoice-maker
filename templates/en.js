@@ -1,18 +1,21 @@
-module.exports = (invoice) => `
+module.exports = (invoice) => {
+  const unicodeMinus = '\u2212'
+
+  return `
 ---
 title: \\vspace{-5ex} Invoice
 ---
 
 -------------- --------------
-   Invoice ID: ${invoice.id}
+   Invoice ID: **${invoice.id}**
 
- Issuing Date: ${invoice.issuingDate
+ Issuing Date: **${invoice.issuingDate
                   .toISOString()
-                  .substr(0, 10)}
+                  .substr(0, 10)}**
 
-Delivery Date: ${invoice.deliveryDate
+Delivery Date: **${invoice.deliveryDate
                   .toISOString()
-                  .substr(0, 10)}
+                  .substr(0, 10)}**
 -----------------------------
 
 &nbsp;
@@ -23,7 +26,7 @@ Delivery Date: ${invoice.deliveryDate
   \\subsection{Invoice Recipient}
 
   ${invoice.to.name} \\\\
-  ${invoice.to.organization} \\\\
+  ${invoice.to.organization ? `${invoice.to.organization}\\\\` : '\\'}
   ${invoice.to.address.country},
   ${invoice.to.address.city} ${invoice.to.address.zip},
   ${invoice.to.address.street} ${invoice.to.address.number} \\\\
@@ -38,7 +41,7 @@ Delivery Date: ${invoice.deliveryDate
     ? `([${invoice.from.emails[0]}](mailto:${invoice.from.emails[0]}))`
     : ''
   } \\\\
-  ${invoice.from.job} \\\\
+  ${invoice.from.job ? `${invoice.from.job}\\\\` : '\\'}
   ${invoice.from.address.country},
   ${invoice.from.address.city} ${invoice.from.address.zip},
   ${invoice.from.address.street} ${invoice.from.address.number}\
@@ -55,22 +58,39 @@ Delivery Date: ${invoice.deliveryDate
 
 ${invoice.taskTable}
 
+
+\\begin{flushright}
+
 ${invoice.totalDuration
-  ? `**Total working time: ${invoice.totalDuration} min**`
+  ? `Total working time: ${invoice.totalDuration} min`
   : ''
 }
 
-${invoice.discount.value
-  ? `Subtotal: **${invoice.subTotal} €**\n\n` +
-    `Discount of ${invoice.discount.value * 100} %
-      ${invoice.discount.reason
-        ? `(${invoice.discount.reason}):`
-        : ''
-      } **\u2212${invoice.discount.amount}**` // Unicode minus
+${invoice.discount || invoice.vat
+  ? `Subtotal: ${invoice.subTotal.toFixed(2)} \\euro\n\n`
   : ''
 }
 
-Total amount: **${invoice.total} $**
+${invoice.discount
+  ? `Discount of ${invoice.discount.value * 100} \%
+    ${invoice.discount.reason
+      ? `(${invoice.discount.reason}):`
+      : ''
+    } ${unicodeMinus}${invoice.discount.amount.toFixed(2)}  \\euro`
+  : ''
+}
+
+${invoice.vat
+  ? `VAT of ${invoice.vat * 100} \\%: ` +
+    `${invoice.tax.toFixed(2)} \\euro`
+  : ''
+}
+
+\\setul{3mm}{0.25mm}
+\\ul{\\textbf{Total amount: ${invoice.total.toFixed(2)} \\euro}}
+
+\\end{flushright}
+
 
 &nbsp;
 
@@ -79,21 +99,25 @@ ${invoice.from.smallBusiness
   : ''
 }
 
+
 Please transfer the money onto following bank account due to
-${invoice.dueDate
+**${invoice.dueDate
   .toISOString()
   .substr(0, 10)
-}:
+}**:
 
 
 &nbsp;
 
-Owner: **${invoice.from.name}**
+--------- ---------------------
+   Owner: **${invoice.from.name}**
 
-IBAN: **${invoice.from.iban}**
+    IBAN: **${invoice.from.iban}**
+-------------------------------
 
 &nbsp;
 
 
 Thank you for the good cooperation!
 `
+}
