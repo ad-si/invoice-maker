@@ -13,7 +13,7 @@ const command =
 childProcess.exec(command, (error, stdout, stderr) => {
   log.assert(!error, error)
   log.assert(!stderr, stderr)
-  log.assert(!stdout, stdout)
+  log.assert(stdout)
 
   log.log('All tests passed ✔')
 })
