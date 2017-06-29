@@ -1,6 +1,7 @@
-module.exports = (item, index) => {
-
+module.exports = (item, headerStructure, index) => {
   return Object.assign(
+    {},
+    headerStructure,
     {number: index + 1},
     item,
     {

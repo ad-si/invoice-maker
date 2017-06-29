@@ -55,15 +55,24 @@ function calcDeliveryDate (items) {
 }
 
 function buildTaskTable (data, items) {
+  const headerStructure = {}
+  Object
+    .keys(headerTexts[data.language])
+    .forEach(key => headerStructure[key] = undefined)
+
+  const formattedItems = items
+    .map(item => {
+      if (typeof item.price === 'number') {
+        item.price = item.price.toFixed(2)
+      }
+      return item
+    })
+    .map((item, index) =>
+      formatTask(item, headerStructure, index)
+    )
+
   return new Tabledown({
-    data: items
-      .map(item => {
-        if (typeof item.price === 'number') {
-          item.price = item.price.toFixed(2)
-        }
-        return item
-      })
-      .map(formatTask),
+    data: formattedItems,
     alignments,
     headerTexts: headerTexts[data.language],
     capitalizeHeaders: true,
