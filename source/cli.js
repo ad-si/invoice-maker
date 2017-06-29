@@ -15,18 +15,19 @@ const compileMarkdown = require('./compileMarkdown')
 
 const argv = yargsParser(process.argv.slice(2))
 
-if (!argv.data) {
-  log.error(
-    `Usage: invoice-maker \\
-      [--biller <*.yaml>] \\
-      [--recipient <*.yaml>] \\
-      [--output <*.pdf>] \\
-      [--logo <*.png>] \\
-      --data <*.yaml> `
-  )
-  process.exit(1)
-}
-else {
+function main () {
+  if (!argv.data) {
+    log.error(
+      `Usage: invoice-maker \\
+        [--biller <*.yaml>] \\
+        [--recipient <*.yaml>] \\
+        [--output <*.pdf>] \\
+        [--logo <*.png>] \\
+        [--debug] \\
+        --data <*.yaml> `
+    )
+    return
+  }
 
   const dataFilePath = path.resolve(argv.data)
   const idMatch = path
@@ -81,22 +82,27 @@ else {
 
       fsp.writeFileSync(tempFileName, markdownInvoice)
 
-      childProcess.exec(
-        `pandoc ${tempFileName}\
-          --standalone \
-          --latex-engine xelatex \
-          --out ${argv.output}`,
-        (error, stdout, stderr) => {
-          if (error || stderr) {
-            if (error) log.error(error.stack)
-            if (stderr) log.error(stderr)
-          }
-          else {
-            fsp.unlinkSync(tempFileName)
-            if (stdout) log.info(stdout)
-          }
+      const args = [
+        tempFileName,
+        '--standalone',
+        '--latex-engine', 'xelatex',
+        '--out', argv.output,
+      ]
+
+      log.info(`Run "pandoc ${args.join(' ')}"`)
+
+      childProcess.execFile('pandoc', args, (error, stdout, stderr) => {
+        if (error || stderr) {
+          if (error) log.error(error.stack)
+          if (stderr) log.error(stderr)
         }
-      )
+        else {
+          if (!argv.debug) fsp.unlinkSync(tempFileName)
+          if (stdout) log.info(stdout)
+        }
+      })
     })
     .catch(error => log.error(error.stack))
 }
+
+main()
