@@ -6,7 +6,7 @@ module.exports = {
     date: 'Date',
     description: 'Description',
     duration: 'Duration (min)',
-    price: 'Price ($)',
+    price: 'Price (€)',
   },
   de: {
     number: 'Nummer',

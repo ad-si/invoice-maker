@@ -94,7 +94,7 @@ ${invoice.totalDuration
 }
 
 ${invoice.discount || invoice.vat
-  ? `Zwischensumme: ${invoice.subTotal.toFixed(2)} \\euro\n\n`
+  ? `Zwischensumme: ${invoice.subTotal.toFixed(2)} €\n\n`
   : ''
 }
 
@@ -103,13 +103,13 @@ ${invoice.discount
     ${invoice.discount.reason
       ? `(${invoice.discount.reason})`
       : ''
-    }: ${unicodeMinus}${invoice.discount.amount.toFixed(2)}  \\euro`
+    }: ${unicodeMinus}${invoice.discount.amount.toFixed(2)}  €`
   : ''
 }
 
 ${invoice.vat
   ? `Umsatzsteuer von ${invoice.vat * 100} \\%: ` +
-    `${invoice.tax.toFixed(2)} \\euro`
+    `${invoice.tax.toFixed(2)} €`
   : ''
 }
 
