@@ -104,7 +104,7 @@ module.exports = (biller, recipient, data) => {
           else return 1
         }
         if (!itemB.date) return -1
-        return itemB - itemA
+        return itemA.date - itemB.date
       })
       .map(item => {
         if (item.price) return item
