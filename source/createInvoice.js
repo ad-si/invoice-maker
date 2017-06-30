@@ -98,7 +98,14 @@ module.exports = (biller, recipient, data) => {
 
   if (data.items) {
     invoice.items = data.items
-      .reverse() // TODO: Sort by date
+      .sort((itemA, itemB) => {
+        if (!itemA.date) {
+          if (!itemB.date) return 0
+          else return 1
+        }
+        if (!itemB.date) return -1
+        return itemB - itemA
+      })
       .map(item => {
         if (item.price) return item
 
@@ -136,8 +143,6 @@ module.exports = (biller, recipient, data) => {
       invoice.deliveryDate = calcDeliveryDate(invoice.items)
     }
   }
-
-
 
   invoice.deliveryDate = new Date(invoice.deliveryDate || invoice.issuingDate)
 
