@@ -110,7 +110,9 @@ ${invoice.discount
 ${invoice.vat
   ? `Umsatzsteuer von ${invoice.vat * 100} \\%: ` +
     `${invoice.tax.toFixed(2)} €`
-  : ''
+  : recipientUstId && !recipientUstId.startsWith('DE')
+    ? 'Steuerschuldnerschaft des Leistungsempfängers'
+    : ''
 }
 
 \\setul{3mm}{0.25mm}

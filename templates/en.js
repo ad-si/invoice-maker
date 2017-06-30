@@ -83,7 +83,9 @@ ${invoice.discount
 ${invoice.vat
   ? `VAT of ${invoice.vat * 100} \\%: ` +
     `${invoice.tax.toFixed(2)} €`
-  : ''
+  : invoice.vatid && !invoice.vatid.startsWith('DE')
+    ? 'Reverse Charge'
+    : ''
 }
 
 \\setul{3mm}{0.25mm}
