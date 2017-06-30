@@ -3,8 +3,8 @@
 module.exports = {
   en: {
     number: 'Number',
-    date: 'Date',
-    description: 'Description',
+    date: `Date${' '.repeat(5)}`,
+    description: `Description${' '.repeat(50)}`,
     duration: 'Duration (min)',
     price: 'Price (€)',
   },
