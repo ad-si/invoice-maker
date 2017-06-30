@@ -22,6 +22,7 @@ function main () {
         [--biller <*.yaml>] \\
         [--recipient <*.yaml>] \\
         [--output <*.pdf>] \\
+        [--output-directory <directory>] \\
         [--logo <*.png>] \\
         [--debug] \\
         --data <*.yaml> `
@@ -32,42 +33,64 @@ function main () {
   const dataFilePath = path.resolve(argv.data)
   const idMatch = path
     .basename(dataFilePath)
-    .match(/^(\d{4}(-\d\d){2}_\d+)_/)
+    .match(/^(\d{4}(-\d\d){2}(?:_\d+)?)(_|\.|$)/)
   const invoiceId = idMatch ? idMatch[1] : null
 
   fsp
     .readFile(dataFilePath)
     .then(yamlFileContent => {
       const data = yaml.safeLoad(yamlFileContent)
-
       data.id = invoiceId
 
-      if (data.biller) data.biller = `~/Contacts/${data.biller}.yaml`
-      if (data.recipient) data.recipient = `~/Contacts/${data.recipient}.yaml`
+      if (data.biller) {
+        if (typeof data.biller === 'string') {
+          data.billerPath = `~/Contacts/${data.biller}.yaml`
+        }
+      }
+      if (data.recipient) {
+        if (typeof data.recipient === 'string') {
+          data.recipientPath = `~/Contacts/${data.recipient}.yaml`
+        }
+      }
 
-      if (argv.biller) data.biller = path.resolve(argv.biller)
-      if (argv.recipient) data.recipient = path.resolve(argv.recipient)
+      if (argv.biller) data.billerPath = path.resolve(argv.biller)
+      if (argv.recipient) data.recipientPath = path.resolve(argv.recipient)
 
-      if (!data.biller) throw new Error('Biller is not specified')
-      if (!data.recipient) throw new Error('Recipient is not specified')
+      if (!data.biller && !data.billerPath) {
+        throw new Error('Biller is not specified')
+      }
+      if (!data.recipient && !data.recipientPath) {
+        throw new Error('Recipient is not specified')
+      }
+
+      const billerPromise = data.biller
+        ? Promise.resolve(data.biller)
+        : fsp
+          .readFile(untildify(data.billerPath))
+          .then(yaml.safeLoad)
+
+      const recipientPromise = data.recipient
+        ? Promise.resolve(data.recipient)
+        : fsp
+          .readFile(untildify(data.recipientPath))
+          .then(yaml.safeLoad)
 
       if (argv.logo) data.logoPath = path.resolve(argv.logo)
 
       return Promise
         .all([
-          fsp.readFile(untildify(data.biller)),
-          fsp.readFile(untildify(data.recipient)),
+          billerPromise,
+          recipientPromise,
         ])
         .then(yamlFileContents => {
-          const biller = yaml.safeLoad(yamlFileContents[0])
-          const recipient = yaml.safeLoad(yamlFileContents[1])
+          const [biller, recipient] = yamlFileContents
           const markdownInvoice = compileMarkdown(biller, recipient, data)
 
           return markdownInvoice
         })
     })
     .then(markdownInvoice => {
-      if (!argv.output) {
+      if (!argv.output && !argv.outputDirectory) {
         log.info(markdownInvoice)
         return
       }
@@ -86,7 +109,8 @@ function main () {
         tempFileName,
         '--standalone',
         '--latex-engine', 'xelatex',
-        '--out', argv.output,
+        '--out',
+        argv.output || `${path.join(argv.outputDirectory, invoiceId)}.pdf`,
       ]
 
       log.info(`Run "pandoc ${args.join(' ')}"`)
