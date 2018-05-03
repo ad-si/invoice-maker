@@ -82,7 +82,7 @@ function buildTaskTable (data, items) {
 module.exports = (biller, recipient, data) => {
   const invoice = {}
 
-  invoice.issuingDate = new Date()
+  invoice.issuingDate = data.issuingDate || new Date()
   invoice.id = data.id || invoice.issuingDate
     .toISOString()
     .substr(0, 10) + '_1'

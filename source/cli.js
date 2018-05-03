@@ -6,7 +6,7 @@ const crypto = require('crypto')
 const nativeConsole = require('console')
 const log = new nativeConsole.Console(process.stdout, process.stderr)
 
-const fsp = require('fs-promise')
+const fsp = require('fs-extra')
 const yaml = require('js-yaml')
 const yargsParser = require('yargs-parser')
 const untildify = require('untildify')
