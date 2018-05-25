@@ -1,6 +1,12 @@
 module.exports = (invoice) => {
   const unicodeMinus = '\u2212'
 
+  const discountValue = invoice.discount.type === 'fixed'
+    ? `${invoice.discount.value} €`
+    : invoice.discount.type === 'proportionate'
+      ? `${invoice.discount.value * 100} %`
+      : `ERROR: ${invoice.discount.type} is no valid type`
+
   return `
 ---
 title: \\vspace{-5ex} Invoice
@@ -72,7 +78,7 @@ ${invoice.discount || invoice.vat
 }
 
 ${invoice.discount
-  ? `Discount of ${invoice.discount.value * 100} \%
+  ? `Discount of ${discountValue}
     ${invoice.discount.reason
       ? `(${invoice.discount.reason}):`
       : ''
@@ -89,7 +95,8 @@ ${invoice.vat
 }
 
 \\setul{3mm}{0.25mm}
-\\ul{\\textbf{Total amount: ${invoice.total.toFixed(2)} \\euro}}
+\\ul{\\textbf{Total amount: ${invoice.total.toFixed(2)}}}
+${'\\textbf{€}' /* TODO: Also underline € sign */}
 
 \\end{flushright}
 

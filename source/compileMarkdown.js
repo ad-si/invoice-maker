@@ -15,7 +15,7 @@ module.exports = (biller, recipient, invoiceData) => {
       - '\\usepackage{multicol}'
       - '\\usepackage{graphicx}'
       - '\\usepackage{soul}'
-      - '\\usepackage[right]{eurosym}'
+      - '\\usepackage{eurosym}'
       # Top align columns in multicolumn environment
       - '\\raggedcolumns'
     author: |

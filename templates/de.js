@@ -23,29 +23,84 @@ module.exports = (invoice) => {
     )
   }
 
-  return `
----
-title: \\vspace{-5ex} Rechnung
----
+  const discountValue = invoice.discount.type === 'fixed'
+    ? `${invoice.discount.value} €`
+    : invoice.discount.type === 'proportionate'
+      ? `${invoice.discount.value * 100} %`
+      : `ERROR: ${invoice.discount.type} is no valid type`
 
------------------ -----------------
- Rechnungsnummer: **${invoice.id}**
+  const invoiceType = invoice.type === 'quote'
+    ? 'Angebot'
+    : 'Rechnung'
+
+  const invoiceHeader = `
+------------------ -----------------
+  Rechnungsnummer: **${invoice.id}**
+
+Ausstellungsdatum: **${invoice.issuingDate
+                        .toISOString()
+                        .substr(0, 10)}**
+
+      Lieferdatum: **${invoice.deliveryDate
+                        .toISOString()
+                        .substr(0, 10)}**
+-----------------------------------
+`
+
+  const quoteHeader = `
+----------------- ----------------
+  Angebotsnummer: **${invoice.id}**
 
 Austellungsdatum: **${invoice.issuingDate
-                    .toISOString()
-                    .substr(0, 10)}**
-
-     Lieferdatum: **${invoice.deliveryDate
-                    .toISOString()
-                    .substr(0, 10)}**
+                        .toISOString()
+                        .substr(0, 10)}**
 -----------------------------------
+`
+
+  const invoiceEnd =
+`
+${invoice.from.smallBusiness
+  ? 'Gemäß § 19 UStG ist in dem ausgewiesenen Betrag ' +
+    'keine Umsatzsteuer enthalten.&nbsp;'
+  : ''
+}
+
+Bitte überweisen sie den Betrag bis
+**${invoice.dueDate
+  .toISOString()
+  .substr(0, 10)
+}** auf folgendes Konto:
+
+
+&nbsp;
+
+--------- ---------------------
+ Inhaber: **${invoice.from.name}**
+
+    IBAN: **${invoice.from.iban}**
+-------------------------------
+
+&nbsp;
+
+
+Vielen Dank für die gute Zusammenarbeit!
+`
+
+  const quoteEnd = ''
+
+  return `
+---
+title: \\vspace{-5ex} ${invoiceType}
+---
+
+${invoice.type === 'quote' ? quoteHeader : invoiceHeader}
 
 &nbsp;
 &nbsp;
 
 \\begin{multicols}{2}
 
-  \\subsection{Rechnungsempfänger}
+  \\subsection{Empfänger}
 
   ${invoice.to.name} \\\\
   ${invoice.to.organization ? `${invoice.to.organization}\\\\` : '\\'}
@@ -61,7 +116,7 @@ Austellungsdatum: **${invoice.issuingDate
 
 \\columnbreak
 
-  \\subsection{Rechnungssteller}
+  \\subsection{Aussteller}
 
   ${invoice.from.name}
   ${Array.isArray(invoice.from.emails)
@@ -99,7 +154,7 @@ ${invoice.discount || invoice.vat
 }
 
 ${invoice.discount
-  ? `Rabatt von ${invoice.discount.value * 100} \\%
+  ? `Rabatt von ${discountValue}
     ${invoice.discount.reason
       ? `(${invoice.discount.reason})`
       : ''
@@ -116,37 +171,14 @@ ${invoice.vat
 }
 
 \\setul{3mm}{0.25mm}
-\\ul{\\textbf{Gesamtbetrag: ${invoice.total.toFixed(2)} \\euro}}
+\\ul{\\textbf{Gesamtbetrag: ${invoice.total.toFixed(2)}}}
+${'\\textbf{€}' /* TODO: Also underline € sign */}
 
 \\end{flushright}
 
 
 &nbsp;
 
-${invoice.from.smallBusiness
-  ? 'Gemäß § 19 UStG ist in dem ausgewiesenen Betrag ' +
-    'keine Umsatzsteuer enthalten.&nbsp;'
-  : ''
-}
-
-Bitte überweisen sie den Betrag bis
-**${invoice.dueDate
-  .toISOString()
-  .substr(0, 10)
-}** auf folgendes Konto:
-
-
-&nbsp;
-
---------- ---------------------
- Inhaber: **${invoice.from.name}**
-
-    IBAN: **${invoice.from.iban}**
--------------------------------
-
-&nbsp;
-
-
-Vielen Dank für die gute Zusammenarbeit!
+${invoice.type === 'quote' ? quoteEnd : invoiceEnd}
 `
 }

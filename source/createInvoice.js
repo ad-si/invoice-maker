@@ -7,7 +7,9 @@ const alignments = {
   date: 'center',
   description: 'left',
   duration: 'right',
+  quantity: 'right',
   price: 'right',
+  priceTotal: 'right',
 }
 
 
@@ -39,13 +41,13 @@ function sanitizeContact (contact) {
 
 function getSubTotal (items) {
   return items
-    .map(item => Number(item.price))
+    .map(item => Number(item.priceTotal))
     .reduce((current, next) => current + next)
 }
 
-function calcDeliveryDate (items) {
+function calcDeliveryDate (deliveryDate, items) {
   return items
-    .map(item => item.date)
+    .map(item => item.date || new Date(deliveryDate))
     .reduce(
       (previousDate, currentDate) =>
         previousDate > currentDate ? previousDate : currentDate,
@@ -61,8 +63,8 @@ function buildTaskTable (data, items) {
 
   const formattedItems = items
     .map(item => {
-      if (typeof item.price === 'number') {
-        item.price = item.price.toFixed(2)
+      if (typeof item.priceTotal === 'number') {
+        item.priceTotal = item.priceTotal.toFixed(2)
       }
       return item
     })
@@ -82,11 +84,12 @@ function buildTaskTable (data, items) {
 module.exports = (biller, recipient, data) => {
   const invoice = {}
 
+  invoice.type = data.type || 'invoice'
   invoice.issuingDate = data.issuingDate || new Date()
   invoice.id = data.id || invoice.issuingDate
     .toISOString()
     .substr(0, 10) + '_1'
-  invoice.deliveryDate = data.deliveryDate
+  invoice.deliveryDate = calcDeliveryDate(data.deliveryDate, data.items)
 
   invoice.dueDate = new Date(invoice.issuingDate)
   invoice.dueDate.setDate(invoice.issuingDate.getDate() + 14)
@@ -98,30 +101,49 @@ module.exports = (biller, recipient, data) => {
 
   if (data.items) {
     invoice.items = data.items
-      .sort((itemA, itemB) => {
-        if (!itemA.date) {
-          if (!itemB.date) return 0
-          else return 1
-        }
-        if (!itemB.date) return -1
-        return itemA.date - itemB.date
-      })
       .map(item => {
-        if (item.price) return item
-
-        const duration = item.duration || 15 // minutes
-        const hourlyWage = data.hourlyWage || 20 // $/hour
-        const minutesPerHour = 60
-        const price = (duration / minutesPerHour) * hourlyWage
-        item.price = price
+        item.date = item.date || invoice.deliveryDate
         return item
+      })
+      .sort((itemA, itemB) => itemA.date - itemB.date)
+      .map(item => {
+        if (Number.isFinite(item.price)) {
+          if (!Number.isFinite(item.quantity)) return item
+
+          item.priceTotal = item.price * item.quantity
+          return item
+        }
+        else if (Number.isFinite(item.duration)) {
+          const duration = item.duration // minutes
+          const hourlyWage = data.hourlyWage || 20 // $/hour
+          const minutesPerHour = 60
+          const price = (duration / minutesPerHour) * hourlyWage
+          item.priceTotal = price
+          return item
+        }
+        else {
+          throw new Error('Set price or duration')
+        }
       })
 
     invoice.total = invoice.subTotal = getSubTotal(invoice.items)
 
     if (data.discount) {
-      invoice.discount = data.discount
-      invoice.discount.amount = invoice.subTotal * invoice.discount.value
+      if (data.discount.type === 'fixed') {
+        invoice.discount = data.discount
+        invoice.discount.amount = data.discount.value
+      }
+      else if (
+          typeof data.discount.type === 'undefined' ||
+          data.discount.type === 'proportionate'
+        ) {
+        invoice.discount = data.discount
+        invoice.discount.amount = invoice.subTotal * invoice.discount.value
+      }
+      else  {
+        throw new Error(`"${data.discount.type} is no valid discount type"`)
+      }
+
       invoice.total -= invoice.discount.amount
     }
 
@@ -138,10 +160,6 @@ module.exports = (biller, recipient, data) => {
       .reduce((current, next) => current + next)
 
     invoice.taskTable = buildTaskTable(data, invoice.items)
-
-    if (!invoice.deliveryDate) {
-      invoice.deliveryDate = calcDeliveryDate(invoice.items)
-    }
   }
 
   invoice.deliveryDate = new Date(invoice.deliveryDate || invoice.issuingDate)

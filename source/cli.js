@@ -108,7 +108,7 @@ function main () {
       const args = [
         tempFileName,
         '--standalone',
-        '--pdf-engine', 'lualatex',
+        '--pdf-engine', 'xelatex',
         '--out',
         argv.output || `${path.join(argv.outputDirectory, invoiceId)}.pdf`,
       ]
