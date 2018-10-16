@@ -41,7 +41,7 @@ invoice-maker \
   --recipient tests/recipient.yaml \
   --data tests/invoice.yaml \
   --logo images/wordmark.png \
-  --output invoice.pdf
+  --output tests/invoice.pdf
 ```
 
 Checkout the [tests](./tests) directory for more example files.

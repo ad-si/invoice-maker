@@ -23,11 +23,15 @@ module.exports = (invoice) => {
     )
   }
 
-  const discountValue = invoice.discount.type === 'fixed'
+  let discountValue = ''
+
+  if (invoice.discount) {
+    discountValue = invoice.discount.type === 'fixed'
     ? `${invoice.discount.value} €`
     : invoice.discount.type === 'proportionate'
       ? `${invoice.discount.value * 100} %`
       : `ERROR: ${invoice.discount.type} is no valid type`
+  }
 
   const invoiceType = invoice.type === 'quote'
     ? 'Angebot'
@@ -65,22 +69,28 @@ ${invoice.from.smallBusiness
   : ''
 }
 
-Bitte überweisen sie den Betrag bis
+Bitte überweisen Sie den Betrag bis
 **${invoice.dueDate
   .toISOString()
   .substr(0, 10)
-}** auf folgendes Konto:
+}** auf eins der folgenden Konten:
 
-
-&nbsp;
-
---------- ---------------------
+--------- ----------------------
  Inhaber: **${invoice.from.name}**
 
     IBAN: **${invoice.from.iban}**
--------------------------------
+--------------------------------
 
-&nbsp;
+\\begin{center}
+oder
+\\end{center}
+
+-------- -----------------------
+ PayPal: [**paypal.me/feramhq/${invoice.total}**][paypal]
+ ${'' /* This empty line is necessary for formatting */}
+--------------------------------
+
+[paypal]: https://www.paypal.me/${invoice.from.paypalme}/${invoice.total}
 
 
 Vielen Dank für die gute Zusammenarbeit!

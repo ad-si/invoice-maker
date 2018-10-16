@@ -12,6 +12,7 @@ module.exports = (biller, recipient, invoiceData) => {
     geometry: top=30mm, bottom=30mm, left=30mm, right=30mm
     mainfont: Helvetica
     header-includes:
+      - \\usepackage[utf8]{inputenc}
       - '\\usepackage{multicol}'
       - '\\usepackage{graphicx}'
       - '\\usepackage{soul}'

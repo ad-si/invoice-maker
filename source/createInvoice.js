@@ -103,15 +103,12 @@ module.exports = (biller, recipient, data) => {
     invoice.items = data.items
       .map(item => {
         item.date = item.date || invoice.deliveryDate
-        return item
-      })
-      .sort((itemA, itemB) => itemA.date - itemB.date)
-      .map(item => {
-        if (Number.isFinite(item.price)) {
-          if (!Number.isFinite(item.quantity)) return item
+        item.quantity = Number.isFinite(item.quantity)
+          ? item.quantity
+          : 1
 
+        if (Number.isFinite(item.price)) {
           item.priceTotal = item.price * item.quantity
-          return item
         }
         else if (Number.isFinite(item.duration)) {
           const duration = item.duration // minutes
@@ -119,12 +116,13 @@ module.exports = (biller, recipient, data) => {
           const minutesPerHour = 60
           const price = (duration / minutesPerHour) * hourlyWage
           item.priceTotal = price
-          return item
         }
         else {
           throw new Error('Set price or duration')
         }
+        return item
       })
+      .sort((itemA, itemB) => itemA.date - itemB.date)
 
     invoice.total = invoice.subTotal = getSubTotal(invoice.items)
 
