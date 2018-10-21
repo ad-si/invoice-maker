@@ -75,7 +75,8 @@ function main () {
           .readFile(untildify(data.recipientPath))
           .then(yaml.safeLoad)
 
-      if (argv.logo) data.logoPath = path.resolve(argv.logo)
+      // TODO: Use `path.resolve(argv.logo)` when LaTeX accepts absolute paths
+      if (argv.logo) data.logoPath = path.normalize(argv.logo)
 
       return Promise
         .all([

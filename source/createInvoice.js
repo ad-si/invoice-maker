@@ -115,6 +115,7 @@ module.exports = (biller, recipient, data) => {
           const hourlyWage = data.hourlyWage || 20 // $/hour
           const minutesPerHour = 60
           const price = (duration / minutesPerHour) * hourlyWage
+          item.price = price
           item.priceTotal = price
         }
         else {

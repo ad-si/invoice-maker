@@ -23,6 +23,25 @@ module.exports = (invoice) => {
     )
   }
 
+
+  let paypalme = ''
+
+  if (invoice.from && invoice.from.paypalme) {
+    paypalme = `
+\\begin{center}
+oder
+\\end{center}
+
+-------- -----------------------
+ PayPal: [**paypal.me/${invoice.from.paypalme}/${invoice.total}**][paypal]
+ ${'' /* This empty line is necessary for formatting */}
+--------------------------------
+
+[paypal]: https://www.paypal.me/${invoice.from.paypalme}/${invoice.total}
+`
+  }
+
+
   let discountValue = ''
 
   if (invoice.discount) {
@@ -81,17 +100,7 @@ Bitte überweisen Sie den Betrag bis
     IBAN: **${invoice.from.iban}**
 --------------------------------
 
-\\begin{center}
-oder
-\\end{center}
-
--------- -----------------------
- PayPal: [**paypal.me/feramhq/${invoice.total}**][paypal]
- ${'' /* This empty line is necessary for formatting */}
---------------------------------
-
-[paypal]: https://www.paypal.me/${invoice.from.paypalme}/${invoice.total}
-
+${paypalme}
 
 Vielen Dank für die gute Zusammenarbeit!
 `
