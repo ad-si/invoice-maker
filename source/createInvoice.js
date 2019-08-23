@@ -61,6 +61,11 @@ function buildTaskTable (data, items) {
     .keys(headerTexts[data.language])
     .forEach(key => headerStructure[key] = undefined)
 
+  if (items.every(item => !Boolean(item.duration))) {
+    delete headerStructure.duration
+    delete alignments.duration
+  }
+
   const formattedItems = items
     .map(item => {
       if (typeof item.priceTotal === 'number') {
