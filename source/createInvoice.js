@@ -137,10 +137,7 @@ module.exports = (biller, recipient, data) => {
         invoice.discount = data.discount
         invoice.discount.amount = data.discount.value
       }
-      else if (
-        typeof data.discount.type === 'undefined' ||
-        data.discount.type === 'proportionate'
-      ) {
+      else if (data.discount.type === 'proportionate') {
         invoice.discount = data.discount
         invoice.discount.amount = invoice.subTotal * invoice.discount.value
       }

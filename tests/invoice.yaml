@@ -2,6 +2,7 @@ deliveryDate: 2016-04-10
 language: en
 discount:
   value: 0.15
+  type: proportionate
   reason: Coupon
 vat: 0.19
 

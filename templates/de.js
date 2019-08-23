@@ -51,7 +51,7 @@ oder
     ? `${invoice.discount.value} €`
     : invoice.discount.type === 'proportionate'
       ? `${invoice.discount.value * 100} %`
-      : `ERROR: ${invoice.discount.type} is no valid type`
+      : `ERROR: ${invoice.discount.type} is no valid discount type`
   }
 
   const invoiceType = invoice.type === 'quote'

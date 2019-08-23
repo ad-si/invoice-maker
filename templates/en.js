@@ -4,8 +4,8 @@ module.exports = (invoice) => {
   const discountValue = invoice.discount.type === 'fixed'
     ? `${invoice.discount.value} €`
     : invoice.discount.type === 'proportionate'
-      ? `${invoice.discount.value * 100} %`
-      : `ERROR: ${invoice.discount.type} is no valid type`
+      ? `${invoice.discount.value * 100} \\%`
+      : `ERROR: ${invoice.discount.type} is no valid discount type`
 
   /* eslint-disable indent */
 
@@ -75,28 +75,28 @@ ${invoice.totalDuration
 }
 
 ${invoice.discount || invoice.vat
-  ? `Subtotal: ${invoice.subTotal.toFixed(2)} €\n\n`
+  ? `Subtotal:\\qquad${invoice.subTotal.toFixed(2)} €\n\n`
   : ''
 }
 
 ${invoice.discount
-  ? `Discount of ${discountValue}
+  ? `Discount of  ${discountValue}
     ${invoice.discount.reason
-      ? `(${invoice.discount.reason}):`
+      ? `(${invoice.discount.reason}):\\qquad`
       : ''
     } ${unicodeMinus}${invoice.discount.amount.toFixed(2)}  €`
   : ''
 }
 
 ${invoice.vat
-  ? `VAT of ${invoice.vat * 100} \\%: ` +
+  ? `VAT of ${invoice.vat * 100} \\%:\\qquad` +
     `${invoice.tax.toFixed(2)} €`
   : invoice.vatid && !invoice.vatid.startsWith('DE')
     ? 'Reverse Charge'
     : ''
 }
 
-\\textbf{Total amount: ${invoice.total.toFixed(2)}}
+\\textbf{Total amount:\\qquad${invoice.total.toFixed(2)}}
 ${'\\textbf{€}' /* TODO: Also underline € sign */}
 
 \\end{flushright}
