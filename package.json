@@ -2,13 +2,14 @@
   "name": "invoice-maker",
   "version": "0.2.0",
   "description": "Generate invoices from YAML files",
+  "repository": "https://github.com/ad-si/invoice-maker",
   "main": "source/compile.js",
   "bin": "source/cli.js",
   "scripts": {
     "lint": "eslint --max-warnings 0 .",
     "cli-test": "node tests/cli.js",
-    "test": "yarn lint && yarn cli-test",
-    "prepublish": "npm test"
+    "test": "npm run lint && npm run cli-test",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "invoice",
@@ -19,16 +20,16 @@
   "dependencies": {
     "@adius/yaml2json": "^0.1.2",
     "common-tags": "^1.4.0",
-    "fs-extra": "^4.0.2",
+    "fs-extra": "^8.1.0",
     "js-yaml": "^3.5.5",
     "tabledown": "^0.3.0",
-    "untildify": "^3.0.2",
-    "yargs-parser": "^2.4.0"
+    "untildify": "^4.0.0",
+    "yargs-parser": "^13.1.1"
   },
   "devDependencies": {
-    "eslint": "^3.19.0",
+    "eslint": "^6.2.1",
     "eslint-config-javascript": "^1.3.0",
-    "javascript-styleguide": "^0.2.2"
+    "javascript-styleguide": "^1.0.0"
   },
   "eslintConfig": {
     "extends": "eslint-config-javascript"
