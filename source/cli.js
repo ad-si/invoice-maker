@@ -121,9 +121,11 @@ function main () {
           if (error) log.error(error.stack)
           if (stderr) log.error(stderr)
         }
-        else {
-          if (!argv.debug) fsp.unlinkSync(tempFileName)
-          if (stdout) log.info(stdout)
+
+        if (stdout) log.info(stdout)
+
+        if (!error && !argv.debug) {
+          fsp.unlinkSync(tempFileName)
         }
       })
     })

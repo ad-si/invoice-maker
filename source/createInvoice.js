@@ -61,7 +61,7 @@ function buildTaskTable (data, items) {
     .keys(headerTexts[data.language])
     .forEach(key => headerStructure[key] = undefined)
 
-  if (items.every(item => !Boolean(item.duration))) {
+  if (items.every(item => !item.duration)) {
     delete headerStructure.duration
     delete alignments.duration
   }
@@ -138,9 +138,9 @@ module.exports = (biller, recipient, data) => {
         invoice.discount.amount = data.discount.value
       }
       else if (
-          typeof data.discount.type === 'undefined' ||
-          data.discount.type === 'proportionate'
-        ) {
+        typeof data.discount.type === 'undefined' ||
+        data.discount.type === 'proportionate'
+      ) {
         invoice.discount = data.discount
         invoice.discount.amount = invoice.subTotal * invoice.discount.value
       }

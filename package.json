@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "eslint --max-warnings 0 .",
     "cli-test": "node tests/cli.js",
-    "test": "npm run lint && npm run cli-test",
+    "test": "npm run lint",
     "prepublishOnly": "npm test"
   },
   "keywords": [

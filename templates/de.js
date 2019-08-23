@@ -24,6 +24,8 @@ module.exports = (invoice) => {
   }
 
 
+  /* eslint-disable indent */
+
   let paypalme = ''
 
   if (invoice.from && invoice.from.paypalme) {

@@ -7,6 +7,8 @@ module.exports = (invoice) => {
       ? `${invoice.discount.value * 100} %`
       : `ERROR: ${invoice.discount.type} is no valid type`
 
+  /* eslint-disable indent */
+
   return `
 ---
 title: \\vspace{-5ex} Invoice

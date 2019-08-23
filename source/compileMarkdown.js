@@ -6,6 +6,16 @@ const templates = {
 }
 
 module.exports = (biller, recipient, invoiceData) => {
+  const author = invoiceData.logoPath
+    ? oneLineTrim `
+      \\includegraphics
+      [
+        width=80mm,
+        height=20mm,
+        keepaspectratio
+      ]
+      {${invoiceData.logoPath}}`
+    : ''
   const metaData = stripIndent `
     ---
     papersize: a4
@@ -20,17 +30,7 @@ module.exports = (biller, recipient, invoiceData) => {
       # Top align columns in multicolumn environment
       - '\\raggedcolumns'
     author: |
-      ${invoiceData.logoPath
-        ? oneLineTrim `
-          \\includegraphics
-          [
-            width=80mm,
-            height=20mm,
-            keepaspectratio
-          ]
-          {${invoiceData.logoPath}}`
-        : ''
-      }
+      ${author}
       \\vspace{-2ex}
   `
   const invoice = createInvoice(biller, recipient, invoiceData)
