@@ -90,11 +90,11 @@ ${invoice.from.smallBusiness
   : ''
 }
 
-Bitte überweisen Sie den Betrag bis
+Bitte überweise den Betrag bis
 **${invoice.dueDate
   .toISOString()
   .substr(0, 10)
-}** auf eins der folgenden Konten:
+}** auf eines der folgenden Konten:
 
 --------- ----------------------
  Inhaber: **${invoice.from.name}**
@@ -191,8 +191,7 @@ ${invoice.vat
     : ''
 }
 
-\\setul{3mm}{0.25mm}
-\\ul{\\textbf{Gesamtbetrag: ${invoice.total.toFixed(2)}}}
+\\textbf{Gesamtbetrag: ${invoice.total.toFixed(2)}}
 ${'\\textbf{€}' /* TODO: Also underline € sign */}
 
 \\end{flushright}

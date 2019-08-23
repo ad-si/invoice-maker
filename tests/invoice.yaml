@@ -17,7 +17,9 @@ items:
   - date: 2016-04-07
     description: Lightsaber
     price: 360000
+    quantity: 2
 
   - date: 2016-04-08
     description: Sonic screwdriver
     price: 80000
+    quantity: 10

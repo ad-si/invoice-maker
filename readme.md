@@ -7,23 +7,19 @@ Generate beautiful invoices from YAML files.
 
 ## Installation
 
-```sh
-npm install --global invoice-maker
-```
-
-or
+The easiest way to install invoice-maker is to pull its Docker image:
 
 ```sh
-yarn global add invoice-maker
+docker pull adius/invoice-maker
 ```
 
 
 ## Usage
 
-Run the plain command to get usage information:
+Run the command without any arguments to print the usage information:
 
-```sh
-$ invoice-maker
+```txt
+$ docker run --rm -v "$PWD":/workdir invoice-maker
 Usage: invoice-maker \
         [--biller <*.yaml>] \
         [--recipient <*.yaml>] \
@@ -33,10 +29,10 @@ Usage: invoice-maker \
         --data <*.yaml>
 ```
 
-E.g. to generate the example invoice you must run:
+E.g. to generate the example invoice you can run:
 
 ```sh
-invoice-maker \
+docker run --rm -v "$PWD":/workdir adius/invoice-maker \
   --biller tests/biller.yaml \
   --recipient tests/recipient.yaml \
   --data tests/invoice.yaml \

@@ -19,13 +19,12 @@ module.exports = (biller, recipient, invoiceData) => {
   const metaData = stripIndent `
     ---
     papersize: a4
-    geometry: top=30mm, bottom=30mm, left=30mm, right=30mm
-    mainfont: Helvetica
+    geometry: top=30mm, bottom=30mm, left=25mm, right=25mm
+    mainfont: LiberationSans
     header-includes:
-      - \\usepackage[utf8]{inputenc}
+      - '\\usepackage[utf8]{inputenc}'
       - '\\usepackage{multicol}'
       - '\\usepackage{graphicx}'
-      - '\\usepackage{soul}'
       - '\\usepackage{eurosym}'
       # Top align columns in multicolumn environment
       - '\\raggedcolumns'

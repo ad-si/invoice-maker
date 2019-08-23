@@ -96,8 +96,7 @@ ${invoice.vat
     : ''
 }
 
-\\setul{3mm}{0.25mm}
-\\ul{\\textbf{Total amount: ${invoice.total.toFixed(2)}}}
+\\textbf{Total amount: ${invoice.total.toFixed(2)}}
 ${'\\textbf{€}' /* TODO: Also underline € sign */}
 
 \\end{flushright}
