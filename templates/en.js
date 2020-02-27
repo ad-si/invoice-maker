@@ -1,5 +1,6 @@
 function emptyObj (obj) {
-  return Object.entries(obj).every(([,val]) => val === '')
+  return Object.entries(obj)
+    .every(([, val]) => val === '')
 }
 
 
@@ -17,10 +18,10 @@ module.exports = (invoice) => {
 
   if (invoice.discount) {
     discountValue = invoice.discount.type === 'fixed'
-    ? `${invoice.discount.value} €`
-    : invoice.discount.type === 'proportionate'
-      ? `${invoice.discount.value * 100} \\%`
-      : `ERROR: ${invoice.discount.type} is no valid discount type`
+      ? `${invoice.discount.value} €`
+      : invoice.discount.type === 'proportionate'
+        ? `${invoice.discount.value * 100} \\%`
+        : `ERROR: ${invoice.discount.type} is no valid discount type`
   }
 
   /* eslint-disable indent */

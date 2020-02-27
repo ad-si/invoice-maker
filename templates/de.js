@@ -1,5 +1,6 @@
 function emptyObj (obj) {
-  return Object.entries(obj).every(([,val]) => val === '')
+  return Object.entries(obj)
+    .every(([, val]) => val === '')
 }
 
 
