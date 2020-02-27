@@ -1,11 +1,28 @@
+function emptyObj (obj) {
+  return Object.entries(obj).every(([,val]) => val === '')
+}
+
+
 module.exports = (invoice) => {
   const unicodeMinus = '\u2212'
+  const safeLb = '\\leavevmode\\\\'
 
-  const discountValue = invoice.discount.type === 'fixed'
+  // Recipient newline
+  const recipientAddressTooLong = Object
+    .values(invoice.to.address)
+    .join()
+    .length > 50
+  const rnl = recipientAddressTooLong ? safeLb : ''
+
+  let discountValue = ''
+
+  if (invoice.discount) {
+    discountValue = invoice.discount.type === 'fixed'
     ? `${invoice.discount.value} €`
     : invoice.discount.type === 'proportionate'
       ? `${invoice.discount.value * 100} \\%`
       : `ERROR: ${invoice.discount.type} is no valid discount type`
+  }
 
   /* eslint-disable indent */
 
@@ -35,9 +52,18 @@ Delivery Date: **${invoice.deliveryDate
 
   ${invoice.to.name} \\\\
   ${invoice.to.organization ? `${invoice.to.organization}\\\\` : '\\'}
-  ${invoice.to.address.country},
-  ${invoice.to.address.city} ${invoice.to.address.zip},
-  ${invoice.to.address.street} ${invoice.to.address.number} \\\\
+  ${invoice.to.address.country ? `${invoice.to.address.country},` : ''}
+  ${invoice.to.address.city && invoice.to.address.zip
+      ? `${invoice.to.address.city} ${invoice.to.address.zip}, ${rnl}`
+      : ''
+  }
+  ${invoice.to.address.street} ${invoice.to.address.number}
+  ${invoice.to.address.addition
+    ? `/ ${invoice.to.address.addition.replace('#', '\\#')}`
+    // TODO: Escape all special LaTeX characters
+    : ''
+  }
+  ${emptyObj(invoice.to.address) ? '' : safeLb}
   ${invoice.to.vatin ? 'Tax ID Number: ' + invoice.to.vatin : ''}
 
 \\columnbreak

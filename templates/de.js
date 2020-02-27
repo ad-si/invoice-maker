@@ -1,21 +1,27 @@
+function emptyObj (obj) {
+  return Object.entries(obj).every(([,val]) => val === '')
+}
+
+
 module.exports = (invoice) => {
   const billerUstId = invoice.from['umsatzsteuer-identifikationsnummer']
   const recipientUstId = invoice.to['umsatzsteuer-identifikationsnummer']
   const unicodeMinus = '\u2212'
+  const safeLb = '\\leavevmode\\\\'
 
   // Biller newline
   const billerAddressTooLong = Object
     .values(invoice.from.address)
     .join()
     .length > 50
-  const bnl = billerAddressTooLong ? '\\\\' : ''
+  const bnl = billerAddressTooLong ? safeLb : ''
 
   // Recipient newline
   const recipientAddressTooLong = Object
     .values(invoice.to.address)
     .join()
     .length > 50
-  const rnl = recipientAddressTooLong ? '\\\\' : ''
+  const rnl = recipientAddressTooLong ? safeLb : ''
 
   if (!billerUstId) {
     throw new Error(
@@ -27,6 +33,8 @@ module.exports = (invoice) => {
   /* eslint-disable indent */
 
   let paypalme = ''
+  const paypalUrl =
+    `paypal.me/${invoice.from.paypalme}/${invoice.total.toFixed(2)}`
 
   if (invoice.from && invoice.from.paypalme) {
     paypalme = `
@@ -35,11 +43,11 @@ oder
 \\end{center}
 
 -------- -----------------------
- PayPal: [**paypal.me/${invoice.from.paypalme}/${invoice.total}**][paypal]
+ PayPal: [**${paypalUrl}**][paypal]
  ${'' /* This empty line is necessary for formatting */}
 --------------------------------
 
-[paypal]: https://www.paypal.me/${invoice.from.paypalme}/${invoice.total}
+[paypal]: https://www.${paypalUrl}
 `
   }
 
@@ -50,7 +58,7 @@ oder
     discountValue = invoice.discount.type === 'fixed'
     ? `${invoice.discount.value} €`
     : invoice.discount.type === 'proportionate'
-      ? `${invoice.discount.value * 100} %`
+      ? `${invoice.discount.value * 100} \\%`
       : `ERROR: ${invoice.discount.type} is no valid discount type`
   }
 
@@ -125,14 +133,18 @@ ${invoice.type === 'quote' ? quoteHeader : invoiceHeader}
 
   ${invoice.to.name} \\\\
   ${invoice.to.organization ? `${invoice.to.organization}\\\\` : '\\'}
-  ${invoice.to.address.country},
-  ${invoice.to.address.city} ${invoice.to.address.zip}, ${rnl}
+  ${invoice.to.address.country ? `${invoice.to.address.country},` : ''}
+  ${invoice.to.address.city && invoice.to.address.zip
+      ? `${invoice.to.address.city} ${invoice.to.address.zip}, ${rnl}`
+      : ''
+  }
   ${invoice.to.address.street} ${invoice.to.address.number}
   ${invoice.to.address.addition
     ? `/ ${invoice.to.address.addition.replace('#', '\\#')}`
     // TODO: Escape all special LaTeX characters
     : ''
-  } \\\\
+  }
+  ${emptyObj(invoice.to.address) ? '' : safeLb}
   ${recipientUstId ? `USt-IdNr.: ${recipientUstId}` : ''}
 
 \\columnbreak
