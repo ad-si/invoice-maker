@@ -7,21 +7,20 @@ module.exports = (invoice) => {
   const billerUstId = invoice.from['umsatzsteuer-identifikationsnummer']
   const recipientUstId = invoice.to['umsatzsteuer-identifikationsnummer']
   const unicodeMinus = '\u2212'
-  const safeLb = '\\leavevmode\\\\'
 
   // Biller newline
   const billerAddressTooLong = Object
     .values(invoice.from.address)
     .join()
     .length > 50
-  const bnl = billerAddressTooLong ? safeLb : ''
+  const bnl = billerAddressTooLong ? '\\\\' : ''
 
   // Recipient newline
   const recipientAddressTooLong = Object
     .values(invoice.to.address)
     .join()
     .length > 50
-  const rnl = recipientAddressTooLong ? safeLb : ''
+  const rnl = recipientAddressTooLong ? '\\\\' : ''
 
   if (!billerUstId) {
     throw new Error(
@@ -138,13 +137,12 @@ ${invoice.type === 'quote' ? quoteHeader : invoiceHeader}
       ? `${invoice.to.address.city} ${invoice.to.address.zip}, ${rnl}`
       : ''
   }
-  ${invoice.to.address.street} ${invoice.to.address.number}
-  ${invoice.to.address.addition
+  ${invoice.to.address.street} ${invoice.to.address.number} ${
+    invoice.to.address.addition
     ? `/ ${invoice.to.address.addition.replace('#', '\\#')}`
     // TODO: Escape all special LaTeX characters
     : ''
-  }
-  ${emptyObj(invoice.to.address) ? '' : safeLb}
+  } ${emptyObj(invoice.to.address) ? '' : '\\\\'}
   ${recipientUstId ? `USt-IdNr.: ${recipientUstId}` : ''}
 
 \\columnbreak

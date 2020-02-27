@@ -5,14 +5,13 @@ function emptyObj (obj) {
 
 module.exports = (invoice) => {
   const unicodeMinus = '\u2212'
-  const safeLb = '\\leavevmode\\\\'
 
   // Recipient newline
   const recipientAddressTooLong = Object
     .values(invoice.to.address)
     .join()
     .length > 50
-  const rnl = recipientAddressTooLong ? safeLb : ''
+  const rnl = recipientAddressTooLong ? '\\\\' : ''
 
   let discountValue = ''
 
@@ -57,13 +56,12 @@ Delivery Date: **${invoice.deliveryDate
       ? `${invoice.to.address.city} ${invoice.to.address.zip}, ${rnl}`
       : ''
   }
-  ${invoice.to.address.street} ${invoice.to.address.number}
-  ${invoice.to.address.addition
+  ${invoice.to.address.street} ${invoice.to.address.number} ${
+    invoice.to.address.addition
     ? `/ ${invoice.to.address.addition.replace('#', '\\#')}`
     // TODO: Escape all special LaTeX characters
     : ''
-  }
-  ${emptyObj(invoice.to.address) ? '' : safeLb}
+  } ${emptyObj(invoice.to.address) ? '' : '\\\\'}
   ${invoice.to.vatin ? 'Tax ID Number: ' + invoice.to.vatin : ''}
 
 \\columnbreak
