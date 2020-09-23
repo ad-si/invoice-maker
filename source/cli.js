@@ -31,10 +31,9 @@ function main () {
   }
 
   const dataFilePath = path.resolve(argv.data)
-  const idMatch = path
-    .basename(dataFilePath)
-    .match(/^(\d{4}(-\d\d){2}(?:_\d+)?)(_|\.|$)/)
-  const invoiceId = idMatch ? idMatch[1] : null
+  const invoiceId = path
+    .basename(dataFilePath, path.extname(dataFilePath))
+    .split('_')[0]
 
   fsp
     .readFile(dataFilePath)
