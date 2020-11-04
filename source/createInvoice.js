@@ -68,8 +68,14 @@ function buildTaskTable (data, items) {
 
   const formattedItems = items
     .map(item => {
+      if (typeof item.price === 'number') {
+        item.price = item.price.toFixed(2)
+      }
       if (typeof item.priceTotal === 'number') {
         item.priceTotal = item.priceTotal.toFixed(2)
+      }
+      if (item.duration === null || item.duration === undefined) {
+        item.duration = ''
       }
       return item
     })
@@ -112,16 +118,30 @@ module.exports = (biller, recipient, data) => {
           ? item.quantity
           : 1
 
-        if (Number.isFinite(item.price)) {
-          item.priceTotal = item.price * item.quantity
+        if (item.price != null) {
+          if (Number.isFinite(item.price)) {
+            item.priceTotal = item.price * item.quantity
+          }
+          else {
+            throw new Error(
+              `Price must be a valid number and not "${item.price}"`
+            )
+          }
         }
-        else if (Number.isFinite(item.duration)) {
-          const duration = item.duration // minutes
-          const hourlyWage = data.hourlyWage || 20 // $/hour
-          const minutesPerHour = 60
-          const price = (duration / minutesPerHour) * hourlyWage
-          item.price = price
-          item.priceTotal = price
+        else if (item.duration != null) {
+          if (Number.isFinite(item.duration)) {
+            const duration = item.duration // minutes
+            const hourlyWage = data.hourlyWage || 20 // $/hour
+            const minutesPerHour = 60
+            const price = (duration / minutesPerHour) * hourlyWage
+            item.price = price
+            item.priceTotal = price
+          }
+          else {
+            throw new Error(
+              `Duration must be a valid number and not "${item.duration}"`
+            )
+          }
         }
         else {
           throw new Error('Set price or duration')
