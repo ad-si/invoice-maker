@@ -19,7 +19,7 @@ module.exports = (biller, recipient, invoiceData) => {
   const metaData = stripIndent `
     ---
     papersize: a4
-    geometry: top=30mm, bottom=30mm, left=25mm, right=25mm
+    geometry: top=25mm, bottom=25mm, left=25mm, right=25mm
     mainfont: LiberationSans
     header-includes:
       - '\\usepackage[utf8]{inputenc}'

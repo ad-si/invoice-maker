@@ -39,11 +39,13 @@ function sanitizeContact (contact) {
   return contact
 }
 
+
 function getSubTotal (items) {
   return items
     .map(item => Number(item.priceTotal))
     .reduce((current, next) => current + next)
 }
+
 
 function calcDeliveryDate (deliveryDate, items) {
   return items
@@ -54,6 +56,7 @@ function calcDeliveryDate (deliveryDate, items) {
       '0000-00-00'
     )
 }
+
 
 function buildTaskTable (data, items) {
   const headerStructure = {}
@@ -83,12 +86,14 @@ function buildTaskTable (data, items) {
       formatTask(item, headerStructure, index)
     )
 
-  return new Tabledown({
+  const table = new Tabledown({
     data: formattedItems,
     alignments,
     headerTexts: headerTexts[data.language],
     capitalizeHeaders: true,
   })
+
+  return table
 }
 
 
