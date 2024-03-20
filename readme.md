@@ -2,15 +2,21 @@
 
 Generate beautiful invoices from YAML files.
 
-[![Example invoice](./images/example-invoice.png)](./tests/invoice.pdf)
-
+[![Example invoice](./images/example-invoice.png)](./tests/invoice-en.pdf)
 
 ## Installation
 
-The easiest way to install invoice-maker is to pull its Docker image:
+### Via npm
+
+```sh
+npm install invoice-maker
+```
+
+### Via Docker
 
 ```sh
 docker pull adius/invoice-maker
+docker run --rm -v "$PWD":/workdir adius/invoice-maker
 ```
 
 
@@ -19,7 +25,7 @@ docker pull adius/invoice-maker
 Run the command without any arguments to print the usage information:
 
 ```txt
-$ docker run --rm -v "$PWD":/workdir invoice-maker
+$ invoice-maker
 Usage: invoice-maker \
         [--biller <*.yaml>] \
         [--recipient <*.yaml>] \
@@ -32,10 +38,10 @@ Usage: invoice-maker \
 E.g. to generate the example invoice you can run:
 
 ```sh
-docker run --rm -v "$PWD":/workdir adius/invoice-maker \
+invoice-maker \
   --biller tests/biller.yaml \
   --recipient tests/recipient.yaml \
-  --data tests/invoice.yaml \
+  --data tests/invoice-en.yaml \
   --logo images/wordmark.png \
   --output tests/invoice.pdf
 ```
@@ -46,14 +52,16 @@ Checkout the [tests](./tests) directory for more example files.
 ## Development
 
 Run Tests:
+
 ```sh
-yarn test
+make test
 ```
 
 Create screenshot:
+
 ```sh
 convert -density 200 \
-  tests/invoice.pdf \
+  tests/invoice-en.pdf \
   -background white \
   -flatten \
   images/example-invoice.png

@@ -5,25 +5,25 @@ discount:
   value: 0.15
   type: proportionate
   reason: Coupon
-vat: 0.19
+vat: 0.15
 
 items:
   - date: 2016-04-03
     description: Arc reactor
-    price: 1300000
+    price: 130000
 
   - date: 2016-04-05
     description: Flux capacitor
-    price: 2700000
+    price: 270000
 
   - date: 2016-04-07
     description: Lightsaber
-    price: 360000
+    price: 36000
     quantity: 2
 
   - date: 2016-04-08
     description: Sonic screwdriver
-    price: 80000
+    price: 8000
     quantity: 10
 
   - date: 2016-04-12
