@@ -9,5 +9,18 @@ test:
 	typst compile typst/example-de.typ
 
 
+typst/example-en.pdf: typst/example-en.typ
+	typst compile $<
+
+
+images/example-invoice.png: typst/example-en.pdf
+	convert -density 200 \
+		$< \
+		-flatten \
+		\( +clone -background black -shadow 30x30+0+0 \) \
+		+swap -background white -layers merge +repage \
+		$@
+
+
 clean:
 	rm -rf node_modules

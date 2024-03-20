@@ -68,13 +68,3 @@ Run Tests:
 ```sh
 make test
 ```
-
-Create screenshot:
-
-```sh
-convert -density 200 \
-  tests/invoice-en.pdf \
-  -background white \
-  -flatten \
-  ../images/example-invoice.png
-```
