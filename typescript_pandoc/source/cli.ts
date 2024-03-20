@@ -123,7 +123,7 @@ async function main () {
       if (stdout) log.info(stdout)
 
       if (!error && !argv.debug) {
-        await fsp.unlink(tempFileName)
+        // await fsp.unlink(tempFileName)
       }
     },
   )

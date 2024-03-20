@@ -1,52 +1,35 @@
 # Invoice Maker
 
-Generate beautiful invoices from YAML files.
+Generate beautiful invoices from a simple data record.
 
 [![Example invoice](./images/example-invoice.png)](./tests/invoice-en.pdf)
 
+
 ## Installation
 
-### Via npm
+There are currently two different implementations:
 
-```sh
-npm install invoice-maker
-```
+- [Typst](https://www.docker.com) template
+- [TypeScript + Pandoc](./typescript_pandoc/) npm package
 
-### Via Docker
-
-```sh
-docker pull adius/invoice-maker
-docker run --rm -v "$PWD":/workdir adius/invoice-maker
-```
+The TypeScript + Pandoc package is the original implementation
+and is now in maintenance mode.
+The Typst template is the new implementation
+and is the recommended way to use Invoice Maker.
+(But doesn't support loading YAML files yet.)
 
 
 ## Usage
 
-Run the command without any arguments to print the usage information:
-
-```txt
-$ invoice-maker
-Usage: invoice-maker \
-        [--biller <*.yaml>] \
-        [--recipient <*.yaml>] \
-        [--output <*.pdf>] \
-        [--logo <*.png>] \
-        [--debug] \
-        --data <*.yaml>
-```
-
-E.g. to generate the example invoice you can run:
-
-```sh
-invoice-maker \
-  --biller tests/biller.yaml \
-  --recipient tests/recipient.yaml \
-  --data tests/invoice-en.yaml \
-  --logo images/wordmark.png \
-  --output tests/invoice.pdf
-```
-
-Checkout the [tests](./tests) directory for more example files.
+1. Download the [invoice-maker.typ](./typst/invoice-maker.typ) file
+1. Create a new `invoice.typ` file. E.g. based on this:
+    - [English example](./typst/example-en.typ)
+    - [German example](./typst/example-de.typ)
+1. Run typst to generate the invoice:
+    ```sh
+    typst compile invoice.typ
+    ```
+1. Open the generated `invoice.pdf` file.
 
 
 ## Development
@@ -61,7 +44,7 @@ Create screenshot:
 
 ```sh
 convert -density 200 \
-  tests/invoice-en.pdf \
+  typst/example-en.pdf \
   -background white \
   -flatten \
   images/example-invoice.png
