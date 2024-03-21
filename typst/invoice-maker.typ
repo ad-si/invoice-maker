@@ -42,6 +42,11 @@
       recipient: "Recipient",
       biller: "Biller",
       invoice: "Invoice",
+      cancellation_invoice: "Cancellation Invoice",
+      cancellation_notice: (id, issuing_date) => [
+        As agreed, you will receive a credit note
+        for the invoice *#id* dated *#issuing_date*.
+      ],
       invoice_id: "Invoice ID",
       issuing_date: "Issuing Date",
       delivery_date: "Delivery Date",
@@ -67,6 +72,11 @@
       recipient: "Empfänger",
       biller: "Aussteller",
       invoice: "Rechnung",
+      cancellation_invoice: "Stornorechnung",
+      cancellation_notice: (id, issuing_date) => [
+        Vereinbarungsgemäß erhalten Sie hiermit eine Gutschrift
+        zur Rechnung *#id* vom *#issuing_date*.
+      ],
       invoice_id: "Rechnungsnummer",
       issuing_date: "Ausstellungsdatum",
       delivery_date: "Lieferdatum",
@@ -91,11 +101,12 @@
   )
 
 #let invoice(
-  title: none,
-  region: "US",
   language: "en",
+  region: "US",
+  title: none,
   banner_image: none,
   invoice_id: none,
+  cancellation_id: none,
   issuing_date: none,
   delivery_date: none,
   due_date: none,
@@ -146,11 +157,17 @@
 
   align(center)[#block(inset: 2em)[
     #text(font: "Arial", weight: "bold", size: 2em)[
-      #(if title != none { title } else { t.invoice })
+      #(if title != none { title } else {
+        if cancellation_id != none { t.cancellation_invoice }
+        else { t.invoice }
+      })
     ]
   ]]
 
-  let invoice_id = if invoice_id != none { invoice_id }
+  let invoice_id_norm_ = if invoice_id != none {
+          if cancellation_id != none { cancellation_id }
+          else { invoice_id }
+        }
         else {
           TODO
           // TODO: Reactivate after Typst supports hour, minute, and second
@@ -165,16 +182,16 @@
   let delivery_date = if delivery_date != none { delivery_date }
         else { TODO }
 
-  align(center)[
-    #table(
+  align(center,
+    table(
       columns: 2,
       align: (right, left),
-      inset: 6pt,
-      [#t.invoice_id:], [*#invoice_id*],
+      inset: 4pt,
+      [#t.invoice_id:], [*#invoice_id_norm_*],
       [#t.issuing_date:], [*#issuing_date*],
       [#t.delivery_date:], [*#delivery_date*],
     )
-  ]
+  )
 
   v(2em)
 
@@ -201,6 +218,9 @@
     ]
   ]
 
+  if cancellation_id != none {
+    (t.cancellation_notice)(invoice_id, issuing_date)
+  }
 
   [== #t.items]
 
@@ -214,6 +234,8 @@
       hourly_rate * (row.dur_min / 60)
     }
   }
+
+  let cancel_neg = if cancellation_id != none { -1 } else { 1 }
 
   table(
     columns: (auto, auto, 1fr, auto, auto, auto, auto),
@@ -250,8 +272,10 @@
           row.description,
           str(if dur_min == 0 and "quantity" in row { "" } else { dur_min }),
           str(row.at("quantity", default: if dur_min == 0 { "1" } else { "" })),
-          str(add_zeros(row.at("price", default: hourly_rate * dur_hour ))),
-          str(add_zeros(getRowTotal(row))),
+          str(add_zeros(cancel_neg *
+           row.at("price", default: hourly_rate * dur_hour )
+          )),
+          str(add_zeros(cancel_neg * getRowTotal(row))),
         )
       })
       .flatten()
@@ -276,22 +300,28 @@
       ([#t.total_time:], [*#totalDuration min*])
     },
     if (discount != 0) or (vat != 0) {
-      ([#t.subtotal:], [#{add_zeros(subTotal)} €])
+      ([#t.subtotal:],
+      [#{add_zeros(cancel_neg * subTotal)} €])
     },
     if discount.amount != 0 {
       (
         [Discount of #discountValue
           #{if discount.reason != "" { discount.reason }}],
-        [#{nbh}#add_zeros(discount.amount)  €]
+        [#{nbh}#add_zeros(cancel_neg * discount.amount)  €]
       )
     },
     if recipient.vat_id.starts-with("DE") and (vat != 0) {
-      ([#t.vat #{vat * 100} %:],  [#{add_zeros(tax)} €])
+      ([#t.vat #{vat * 100} %:],
+        [#{add_zeros(cancel_neg * tax)} €]
+      )
     },
     if (not recipient.vat_id.starts-with("DE")) {
       ([#t.vat:], text(0.9em)[#t.reverse_charge])
     },
-    ([*#t.total*:], [*#add_zeros(total) €*]),
+    (
+      [*#t.total*:],
+      [*#add_zeros(cancel_neg * total) €*]
+    ),
   )
   .filter(entry => entry != none)
 
@@ -313,42 +343,47 @@
 
   v(1em)
 
-  let due_date = if due_date != none { due_date }
-        else {
-          TODO
-          // TODO: Reactivate after Typst supports adding dates
-          // datetime.today().add(days: 14).
-          //   display("[year]-[month]-[day]")
-        }
+  if cancellation_id == none {
+    let due_date = if due_date != none { due_date }
+          else {
+            TODO
+            // TODO: Reactivate after Typst supports adding dates
+            // datetime.today().add(days: 14).
+            //   display("[year]-[month]-[day]")
+          }
 
-  (t.due_text)(due_date)
+    (t.due_text)(due_date)
 
-  align(center)[
-    #v(1em)
-    #table(
-      fill: grayish,
-      // stroke: 1pt + blue,
-      // columns: 2, // TODO: Doesn't work for unknown reason
-      columns: (8em, auto),
-      inset: (col, row) =>
-        if col == 0 {
-          if row == 0 { (top: 1.2em, right: 0.6em, bottom: 0.6em) }
-          else { (top: 0.6em, right: 0.6em, bottom: 1.2em) }
-        }
-        else {
-          if row == 0 { (top: 1.2em, right: 2em, bottom: 0.6em, left: 0.6em) }
-          else { (top: 0.6em, right: 2em, bottom: 1.2em, left: 0.6em) }
-        },
-      align: (col, row) => (right,left,).at(col),
-      table.hline(stroke: 0.5pt),
-      [#t.owner:], [*Scrooge McDuck*],
-      [#t.iban:], [*DL12 3456 7890 1234 56*],
-      table.hline(stroke: 0.5pt),
-    )
-    #v(1em)
-  ]
+    v(1em)
+    align(center)[
+      #table(
+        fill: grayish,
+        // stroke: 1pt + blue,
+        // columns: 2, // TODO: Doesn't work for unknown reason
+        columns: (8em, auto),
+        inset: (col, row) =>
+          if col == 0 {
+            if row == 0 { (top: 1.2em, right: 0.6em, bottom: 0.6em) }
+            else { (top: 0.6em, right: 0.6em, bottom: 1.2em) }
+          }
+          else {
+            if row == 0 { (top: 1.2em, right: 2em, bottom: 0.6em, left: 0.6em) }
+            else { (top: 0.6em, right: 2em, bottom: 1.2em, left: 0.6em) }
+          },
+        align: (col, row) => (right,left,).at(col),
+        table.hline(stroke: 0.5pt),
+        [#t.owner:], [*Scrooge McDuck*],
+        [#t.iban:], [*DL12 3456 7890 1234 56*],
+        table.hline(stroke: 0.5pt),
+      )
+    ]
+    v(1em)
 
-  t.closing
+    t.closing
+  }
+
+  v(1em)
+  align(center, strong(t.closing))
 
   doc
 }
