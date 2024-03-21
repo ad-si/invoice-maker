@@ -3,6 +3,11 @@ help: makefile
 	@tail -n +4 makefile | grep ".PHONY"
 
 
+.PHONY: unit-tests
+unit-tests:
+	typst compile typst/tests.typ
+
+
 typst/%.check: typst/%.typ
 	@typst compile $<
 	@printf "Compare '%s.pdf' to expected output " "$(basename $<)"
@@ -18,6 +23,7 @@ typst/%.check: typst/%.typ
 
 .PHONY: test
 test: \
+	unit-tests \
 	typst/example-en.check \
 	typst/example-de.check \
 	typst/example-load-yaml.check

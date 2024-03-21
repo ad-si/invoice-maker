@@ -14,7 +14,7 @@ biller:
   job: Treasure Hunter
   vat_id: DL1234567
   umsatzsteuer-identifikationsnummer: DL1234567
-  iban: DL12 3456 7890 1234 56
+  iban: GB17 BOFS 8005 5100 8137 96
   smallBusiness: false
   paypalme: scroogemcduck
   address:

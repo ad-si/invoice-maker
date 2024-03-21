@@ -10,6 +10,25 @@
     str(intp) + "." + (str(decp) + "00").slice(0, 2)
   }
 
+// From https://stackoverflow.com/a/57080936/1850340
+#let verify_iban = (country, iban) => {
+    let iban_regexes = (
+        DE: regex(
+          "^DE[a-zA-Z0-9]{2}\s?([0-9]{4}\s?){4}([0-9]{2})$"
+        ),
+        GB: regex(
+          "^GB[a-zA-Z0-9]{2}\s?([a-zA-Z]{4}\s?){1}([0-9]{4}\s?){3}([0-9]{2})$"
+        ),
+      )
+
+    if country == none or not country in iban_regexes {
+      true
+    }
+    else {
+      iban.find(iban_regexes.at(country)) != none
+    }
+}
+
 #let TODO = box(
   inset: (x: 0.5em),
   outset: (y: 0.2em),
@@ -42,6 +61,7 @@
 
 #let languages = (
     en: (
+      country: "GB",
       recipient: "Recipient",
       biller: "Biller",
       invoice: "Invoice",
@@ -72,6 +92,7 @@
       iban: "IBAN",
     ),
     de: (
+      country: "DE",
       recipient: "Empfänger",
       biller: "Aussteller",
       invoice: "Rechnung",
@@ -105,6 +126,7 @@
 
 #let invoice(
   language: "en",
+  country: none,
   title: none,
   banner_image: none,
   invoice_id: none,
@@ -134,6 +156,7 @@
 ) = {
   if data != none {
     language = data.at("language", default: language)
+    country = data.at("country", default: languages.at(language).country)
     title = data.at("title", default: title)
     banner_image = data.at("banner_image", default: banner_image)
     invoice_id = data.at("invoice_id", default: invoice_id)
@@ -150,6 +173,12 @@
     discount = data.at("discount", default: discount)
     vat = data.at("vat", default: vat)
   }
+
+  // Verify inputs
+  assert(
+    verify_iban(country, biller.iban),
+    message: "Invalid IBAN " + biller.iban + " for country " + country
+  )
 
   let t = languages.at(language)
   let signature = ""
