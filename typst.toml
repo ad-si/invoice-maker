@@ -1,0 +1,15 @@
+[package]
+authors = ["Adrian Sieber <@ad-si>"]
+description = "Generate beautiful invoices from a simple data record."
+entrypoint = "typst/invoice-maker.typ"
+exclude = ["typst/*.pdf", "typst/fixtures", "images", "typescript_pandoc"]
+keywords = ["invoice", "accounting", "finance", "money"]
+license = "ISC"
+name = "invoice-maker"
+repository = "https://github.com/ad-si/invoice-maker"
+version = "1.0.0"
+
+[template]
+entrypoint = "invoice-maker.typ"
+path = "typst"
+thumbnail = "images/example-invoice-hq.png"
