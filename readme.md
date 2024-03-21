@@ -2,7 +2,13 @@
 
 Generate beautiful invoices from a simple data record.
 
-[![Example invoice](./images/example-invoice.png)](./tests/invoice-en.pdf)
+<a href="./tests/invoice-en.pdf">
+  <img
+    alt="Example invoice"
+    src="./images/example-invoice.png"
+    style="max-height: 768px"
+  >
+</a>
 
 
 ## Installation
@@ -38,14 +44,4 @@ Run Tests:
 
 ```sh
 make test
-```
-
-Create screenshot:
-
-```sh
-convert -density 200 \
-  typst/example-en.pdf \
-  -background white \
-  -flatten \
-  images/example-invoice.png
 ```

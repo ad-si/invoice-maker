@@ -14,10 +14,12 @@ typst/example-en.pdf: typst/example-en.typ
 
 
 images/example-invoice.png: typst/example-en.pdf
-	convert -density 200 \
+	convert \
+		-density 300 \
+		-resize 640 \
 		$< \
 		-flatten \
-		\( +clone -background black -shadow 30x30+0+0 \) \
+		\( +clone -background black -shadow 30x25+0+0 \) \
 		+swap -background white -layers merge +repage \
 		$@
 
