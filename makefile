@@ -3,10 +3,24 @@ help: makefile
 	@tail -n +4 makefile | grep ".PHONY"
 
 
+typst/%.check: typst/%.typ
+	@typst compile $<
+	@printf "Compare '%s.pdf' to expected output " "$(basename $<)"
+	@magick "$(basename $<).pdf" \
+		null: "typst/fixtures/expected-$*.pdf" \
+		-compose difference \
+		-layers composite \
+		"diff_$*_%d.png"
+	@identify -format "%@" "diff_$*_0.png" \
+	2>&1 | grep -q 'not contain' \
+	&& echo "✅" || echo "❌: typst/$*.pdf changed -> diff_$*_0.png"
+
+
 .PHONY: test
-test:
-	typst compile typst/example-en.typ
-	typst compile typst/example-de.typ
+test: \
+	typst/example-en.check \
+	typst/example-de.check \
+	typst/example-load-yaml.check
 
 
 typst/example-en.pdf: typst/example-en.typ
@@ -25,4 +39,5 @@ images/example-invoice.png: typst/example-en.pdf
 
 
 clean:
-	rm -rf node_modules
+	rm -f diff_*.png
+	rm -f typst/example-*.pdf
