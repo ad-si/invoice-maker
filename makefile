@@ -44,6 +44,10 @@ images/example-invoice.png: typst/example-en.pdf
 		$@
 
 
+images/example-invoice-hq.png: typst/example-en.pdf
+	convert -density 250  -flatten $<  $@
+
+
 clean:
 	rm -f diff_*.png
 	rm -f typst/example-*.pdf
