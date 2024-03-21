@@ -1,0 +1,59 @@
+deliveryDate: 2016-04-10
+issuingDate: 2019-08-23
+language: en
+discount:
+  value: 0.15
+  type: proportionate
+  reason: Coupon
+vat: 0.15
+hourly_rate: 100
+
+biller:
+  name: Scrooge McDuck
+  website: scroogemcduck.com
+  job: Treasure Hunter
+  vat_id: DL1234567
+  umsatzsteuer-identifikationsnummer: DL1234567
+  iban: DL12 3456 7890 1234 56
+  smallBusiness: false
+  paypalme: scroogemcduck
+  address:
+    country: Disneyland
+    city: Duckburg
+    postal_code: 123456
+    street: Killmotor Hill
+    number: 1
+
+recipient:
+  name: Gyro Gearloose
+  organization: Crazy Inventions Ltd.
+  vat_id: DL7654321
+  address:
+    country: Disneyland
+    city: Duckburg
+    postal_code: 123456
+    street: Inventor Drive
+    number: 23
+
+items:
+  - date: 2016-04-03
+    description: Arc reactor
+    price: 13000
+
+  - date: 2016-04-05
+    description: Flux capacitor
+    price: 27000
+
+  - date: 2016-04-07
+    description: Lightsaber
+    price: 3600
+    quantity: 2
+
+  - date: 2016-04-08
+    description: Sonic screwdriver
+    price: 800
+    quantity: 10
+
+  - date: 2016-04-12
+    description: Assembly
+    dur_min: 160

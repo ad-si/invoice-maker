@@ -2,21 +2,26 @@
     name: "Gyro Gearloose",
     title: "Inventor",
     company: "Crazy Inventions Ltd.",
-    country: "Disneyland",
-    city: "Duckburg",
-    postal_code: "123456",
-    street: "Inventor Drive 23",
     vat_id: "DL1234567",
+    iban: "DE89370400440532013000",
+    address: (
+      country: "Disneyland",
+      city: "Duckburg",
+      postal_code: "123456",
+      street: "Inventor Drive 23",
+    ),
   )
 
 #let recipient = (
     name: "Scrooge McDuck",
     title: "Treasure Hunter",
-    country: "Disneyland",
-    city: "Duckburg",
-    postal_code: "123456",
-    street: "Killmotor Hill 1",
     vat_id: "DL7654321",
+    address: (
+      country: "Disneyland",
+      city: "Duckburg",
+      postal_code: "123456",
+      street: "Killmotor Hill 1",
+    )
   )
 
 #let table_data = (

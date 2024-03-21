@@ -1,5 +1,8 @@
 #let nbh = "‑"
 
+// Truncate a number to 2 decimal places
+// and add trailing zeros if necessary
+// E.g. 1.234 -> 1.23, 1.2 -> 1.20
 #let add_zeros = (num) => {
     // Can't use trunc and fract due to rounding errors
     let frags = str(num).split(".")
@@ -102,7 +105,6 @@
 
 #let invoice(
   language: "en",
-  region: "US",
   title: none,
   banner_image: none,
   invoice_id: none,
@@ -125,13 +127,30 @@
     ),
   ),
   items: [],
-  discount: (
-    amount: 0,
-    reason: "",
-  ),
+  discount: none,
   vat: 0.19,
+  data: none,
   doc,
 ) = {
+  if data != none {
+    language = data.at("language", default: language)
+    title = data.at("title", default: title)
+    banner_image = data.at("banner_image", default: banner_image)
+    invoice_id = data.at("invoice_id", default: invoice_id)
+    cancellation_id = data.at("cancellation_id", default: cancellation_id)
+    issuing_date = data.at("issuing_date", default: issuing_date)
+    delivery_date = data.at("delivery_date", default: delivery_date)
+    due_date = data.at("due_date", default: due_date)
+    biller = data.at("biller", default: biller)
+    recipient = data.at("recipient", default: recipient)
+    keywords = data.at("keywords", default: keywords)
+    hourly_rate = data.at("hourly_rate", default: hourly_rate)
+    styling = data.at("styling", default: styling)
+    items = data.at("items", default: items)
+    discount = data.at("discount", default: discount)
+    vat = data.at("vat", default: vat)
+  }
+
   let t = languages.at(language)
   let signature = ""
 
@@ -146,7 +165,6 @@
   set par(justify: true)
   set text(
     lang: language,
-    region: region,
     font: styling.font,
     size: styling.fontsize,
   )
@@ -201,8 +219,8 @@
       #v(0.5em)
       #recipient.name \
       #{if "title" in recipient { [#recipient.title \ ] }}
-      #recipient.city #recipient.postal_code \
-      #recipient.street \
+      #recipient.address.city #recipient.address.postal_code \
+      #recipient.address.street \
       #{if recipient.vat_id.starts-with("DE"){"USt-IdNr.:"}}
         #recipient.vat_id
 
@@ -211,8 +229,8 @@
       #v(0.5em)
       #biller.name \
       #{if "title" in biller { [#biller.title \ ] }}
-      #biller.city #biller.postal_code \
-      #biller.street \
+      #biller.address.city #biller.address.postal_code \
+      #biller.address.street \
       #{if biller.vat_id.starts-with("DE"){"USt-IdNr.:"}}
         #biller.vat_id
     ]
@@ -231,7 +249,7 @@
       row.price * row.at("quantity", default: 1)
     }
     else {
-      hourly_rate * (row.dur_min / 60)
+      calc.round(hourly_rate * (row.dur_min / 60), digits: 2)
     }
   }
 
@@ -270,10 +288,10 @@
           row.at("number", default: index + 1),
           row.date,
           row.description,
-          str(if dur_min == 0 and "quantity" in row { "" } else { dur_min }),
+          str(if dur_min == 0 { "" } else { dur_min }),
           str(row.at("quantity", default: if dur_min == 0 { "1" } else { "" })),
           str(add_zeros(cancel_neg *
-           row.at("price", default: hourly_rate * dur_hour )
+           row.at("price", default: calc.round(hourly_rate * dur_hour, digits: 2))
           )),
           str(add_zeros(cancel_neg * getRowTotal(row))),
         )
@@ -291,23 +309,34 @@
         .map(row => int(row.at("dur_min", default: 0)))
         .sum()
 
+  let discountValue = if discount == none { 0 }
+    else {
+      if (discount.type == "fixed") {
+        discount.value
+      }
+      else if discount.type == "proportionate" {
+        subTotal * discount.value
+      }
+      else {
+        panic(["#discount.type" is no valid discount type])
+      }
+    }
   let tax = subTotal * vat
-  let total = subTotal + tax
-  let discountValue = 0
+  let total = subTotal - discountValue + tax
 
   let table_entries = (
     if totalDuration != 0 {
       ([#t.total_time:], [*#totalDuration min*])
     },
-    if (discount != 0) or (vat != 0) {
+    if (discountValue != 0) or (vat != 0) {
       ([#t.subtotal:],
       [#{add_zeros(cancel_neg * subTotal)} €])
     },
-    if discount.amount != 0 {
+    if discountValue != 0 {
       (
         [Discount of #discountValue
           #{if discount.reason != "" { discount.reason }}],
-        [#{nbh}#add_zeros(cancel_neg * discount.amount)  €]
+        [#{nbh}#add_zeros(cancel_neg * discount.value)  €]
       )
     },
     if recipient.vat_id.starts-with("DE") and (vat != 0) {
@@ -372,8 +401,8 @@
           },
         align: (col, row) => (right,left,).at(col),
         table.hline(stroke: 0.5pt),
-        [#t.owner:], [*Scrooge McDuck*],
-        [#t.iban:], [*DL12 3456 7890 1234 56*],
+        [#t.owner:], [*#biller.name*],
+        [#t.iban:], [*#biller.iban*],
         table.hline(stroke: 0.5pt),
       )
     ]
@@ -381,9 +410,10 @@
 
     t.closing
   }
-
-  v(1em)
-  align(center, strong(t.closing))
+  else {
+    v(1em)
+    align(center, strong(t.closing))
+  }
 
   doc
 }
