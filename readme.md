@@ -6,7 +6,7 @@ Generate beautiful invoices from a simple data record.
   <img
     alt="Example invoice"
     src="./images/example-invoice.png"
-    style="max-height: 768px"
+    height="768"
   >
 </a>
 
