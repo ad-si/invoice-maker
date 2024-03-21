@@ -2,7 +2,7 @@
 
 Generate beautiful invoices from a simple data record.
 
-<a href="./tests/invoice-en.pdf">
+<a href="./typst/example-en.pdf">
   <img
     alt="Example invoice"
     src="./images/example-invoice.png"
