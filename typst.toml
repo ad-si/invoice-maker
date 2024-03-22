@@ -1,6 +1,8 @@
 [package]
 authors = ["Adrian Sieber <@ad-si>"]
+categories = ["office"]
 description = "Generate beautiful invoices from a simple data record."
+disciplines = ["business"]
 entrypoint = "typst/invoice-maker.typ"
 exclude = ["typst/*.pdf", "typst/fixtures", "images", "typescript_pandoc"]
 keywords = ["invoice", "accounting", "finance", "money"]
