@@ -1,2 +1,3 @@
-*.pdf
-diff_*.png
+/*.pdf
+/diff_*.png
+/examples/*.pdf

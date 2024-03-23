@@ -37,6 +37,7 @@ test: \
 	examples/en.check \
 	examples/de.check \
 	examples/load-yaml.check \
+	examples/with-body.check \
 	template/main.pdf
 
 
