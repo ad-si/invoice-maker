@@ -1,20 +1,20 @@
-invoice_id: 2023-11-23t091613
-delivery_date: 2023-11-23
-issuing_date: 2024-03-10
-due_date: 2024-03-24
+invoice-id: 2023-11-23t091613
+delivery-date: 2023-11-23
+issuing-date: 2024-03-10
+due-date: 2024-03-24
 language: en
 discount:
   value: 0.15
   type: proportionate
   reason: Coupon
 vat: 0.15
-hourly_rate: 100
+hourly-rate: 100
 
 biller:
   name: Scrooge McDuck
   website: scroogemcduck.com
   job: Treasure Hunter
-  vat_id: DL1234567
+  vat-id: DL1234567
   umsatzsteuer-identifikationsnummer: DL1234567
   iban: GB17 BOFS 8005 5100 8137 96
   smallBusiness: false
@@ -22,18 +22,18 @@ biller:
   address:
     country: Disneyland
     city: Duckburg
-    postal_code: 123456
+    postal-code: 123456
     street: Killmotor Hill
     number: 1
 
 recipient:
   name: Gyro Gearloose
   organization: Crazy Inventions Ltd.
-  vat_id: DL7654321
+  vat-id: DL7654321
   address:
     country: Disneyland
     city: Duckburg
-    postal_code: 123456
+    postal-code: 123456
     street: Inventor Drive
     number: 23
 
@@ -58,4 +58,4 @@ items:
 
   - date: 2016-04-12
     description: Assembly
-    dur_min: 160
+    dur-min: 160

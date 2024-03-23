@@ -1,12 +1,12 @@
 #import "invoice-maker.typ": *
 
-#{ // add_zeros()
-  assert.eq(add_zeros(1.234), "1.23")
-  assert.eq(add_zeros(1.2), "1.20")
+#{ // add-zeros()
+  assert.eq(add-zeros(1.234), "1.23")
+  assert.eq(add-zeros(1.2), "1.20")
 }
 
-#{// verify_iban()
-  let iban_tests = (
+#{// verify-iban()
+  let iban-tests = (
       ("DE", "DE44 5001 0517 5407 3249 31", true),
       ("DE", "DE89 3704 0044 0532 0130 00", true),
 
@@ -24,12 +24,12 @@
       ("GB", "1GB91 2100 0418 4502 0005 1332", false),
     )
 
-  for (country, iban, expected_result) in iban_tests {
+  for (country, iban, expected-result) in iban-tests {
     assert.eq(
-      verify_iban(country, iban),
-      expected_result,
+      verify-iban(country, iban),
+      expected-result,
       message: "IBAN '" + iban + "' should be "
-        + if expected_result { "valid" } else { "invalid" }
+        + if expected-result { "valid" } else { "invalid" }
         + " for " + country
     )
   }
