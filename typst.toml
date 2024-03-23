@@ -12,6 +12,6 @@ repository = "https://github.com/ad-si/invoice-maker"
 version = "1.0.0"
 
 [template]
-entrypoint = "invoice-maker.typ"
-path = "."
+entrypoint = "main.typ"
+path = "template"
 thumbnail = "images/example-invoice-hq.png"

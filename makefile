@@ -21,12 +21,23 @@ examples/%.check: examples/%.typ
 	&& echo "✅" || echo "❌: examples/$*.pdf changed -> diff_$*_0.png"
 
 
+template/main.pdf: template/main-local.typ invoice-maker.typ
+	typst compile --root='.' $< $@
+
+
+.INTERMEDIATE: template/main-local.typ
+template/main-local.typ: template/main.typ
+	echo '#import "../invoice-maker.typ": *' > $@
+	tail -n +2 $< >> $@
+
+
 .PHONY: test
 test: \
 	unit-tests \
 	examples/en.check \
 	examples/de.check \
-	examples/load-yaml.check
+	examples/load-yaml.check \
+	template/main.pdf
 
 
 examples/en.pdf: examples/en.typ
