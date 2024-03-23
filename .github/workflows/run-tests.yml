@@ -18,7 +18,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Typst
-        run: cargo install typst
+        run: cargo install typst-cli
 
       - name: Run tests
         run: make test
