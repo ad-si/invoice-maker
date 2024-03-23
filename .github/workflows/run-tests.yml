@@ -20,5 +20,8 @@ jobs:
       - name: Install Typst
         run: cargo install typst-cli
 
+      - name: Install ImageMagick
+        uses: mfinelli/setup-imagemagick@v5
+
       - name: Run tests
         run: make test
