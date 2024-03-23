@@ -20,6 +20,9 @@ jobs:
       - name: Install Typst
         run: cargo install typst-cli
 
+      - name: Install Ghostscript
+        run: sudo apt-get install ghostscript
+
       - name: Install ImageMagick
         uses: mfinelli/setup-imagemagick@v5
 
