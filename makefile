@@ -5,35 +5,35 @@ help: makefile
 
 .PHONY: unit-tests
 unit-tests:
-	typst compile typst/tests.typ
+	typst compile tests.typ
 
 
-typst/examples/%.check: typst/examples/%.typ
+examples/%.check: examples/%.typ
 	@typst compile --root="." $<
 	@printf "Compare '%s.pdf' to expected output " "$(basename $<)"
 	@magick "$(basename $<).pdf" \
-		null: "typst/fixtures/expected-$*.pdf" \
+		null: "fixtures/expected-$*.pdf" \
 		-compose difference \
 		-layers composite \
 		"diff_$*_%d.png"
 	@identify -format "%@" "diff_$*_0.png" \
 	2>&1 | grep -q 'not contain' \
-	&& echo "✅" || echo "❌: typst/examples/$*.pdf changed -> diff_$*_0.png"
+	&& echo "✅" || echo "❌: examples/$*.pdf changed -> diff_$*_0.png"
 
 
 .PHONY: test
 test: \
 	unit-tests \
-	typst/examples/en.check \
-	typst/examples/de.check \
-	typst/examples/load-yaml.check
+	examples/en.check \
+	examples/de.check \
+	examples/load-yaml.check
 
 
-typst/examples/en.pdf: typst/examples/en.typ
+examples/en.pdf: examples/en.typ
 	typst compile $<
 
 
-images/example-invoice.png: typst/examples/en.pdf
+images/example-invoice.png: examples/en.pdf
 	convert \
 		-density 300 \
 		-resize 640 \
@@ -44,10 +44,10 @@ images/example-invoice.png: typst/examples/en.pdf
 		$@
 
 
-images/example-invoice-hq.png: typst/examples/en.pdf
+images/example-invoice-hq.png: examples/en.pdf
 	convert -density 250  -flatten $<  $@
 
 
 clean:
 	rm -f diff_*.png
-	rm -f typst/examples/*.pdf
+	rm -f examples/*.pdf

@@ -2,7 +2,7 @@
 
 Generate beautiful invoices from a simple data record.
 
-<a href="./typst/fixtures/expected-example-en.pdf">
+<a href="./fixtures/expected-en.pdf">
   <img
     alt="Example invoice"
     src="./images/example-invoice.png"
@@ -36,12 +36,12 @@ Generate beautiful invoices from a simple data record.
 
 ## Installation & Usage
 
-1. Download the [invoice-maker.typ](./typst/invoice-maker.typ) file
+1. Download the [invoice-maker.typ](./invoice-maker.typ) file
 1. Create a new `invoice.typ` file.
     E.g. based on one of the examples below:
-    - [English example](./typst/example-en.typ)
-    - [German example](./typst/example-de.typ)
-    - [YAML example](./typst/example-load-yaml.typ)
+    - [English example](./example-en.typ)
+    - [German example](./example-de.typ)
+    - [YAML example](./example-load-yaml.typ)
 1. Run typst to generate the invoice:
     ```sh
     typst compile invoice.typ

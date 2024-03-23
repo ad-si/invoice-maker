@@ -3,8 +3,8 @@ authors = ["Adrian Sieber <@ad-si>"]
 categories = ["office"]
 description = "Generate beautiful invoices from a simple data record."
 disciplines = ["business"]
-entrypoint = "typst/invoice-maker.typ"
-exclude = ["typst/*.pdf", "typst/fixtures", "images", "typescript_pandoc"]
+entrypoint = "invoice-maker.typ"
+exclude = ["*.pdf", "fixtures", "images", "typescript_pandoc"]
 keywords = ["invoice", "accounting", "finance", "money"]
 license = "ISC"
 name = "invoice-maker"
@@ -13,5 +13,5 @@ version = "1.0.0"
 
 [template]
 entrypoint = "invoice-maker.typ"
-path = "typst"
+path = "."
 thumbnail = "images/example-invoice-hq.png"
