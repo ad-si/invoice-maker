@@ -29,6 +29,21 @@
     }
 }
 
+#let parse-date = (date-str) => {
+  let parts = date-str.split("-")
+  if parts.len() != 3 {
+    panic(
+      "Invalid date string: " + date-str + "\n" +
+      "Expected format: YYYY-MM-DD"
+    )
+  }
+  datetime(
+    year: int(parts.at(0)),
+    month: int(parts.at(1)),
+    day: int(parts.at(2)),
+  )
+}
+
 #let TODO = box(
   inset: (x: 0.5em),
   outset: (y: 0.2em),
@@ -186,6 +201,7 @@
   set document(
     title: title,
     keywords: keywords,
+    date: parse-date(issuing-date),
   )
   set page(
     margin: styling.margin,

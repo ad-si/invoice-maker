@@ -34,3 +34,10 @@
     )
   }
 }
+
+#{//parse-date
+  assert.eq(
+    parse-date("2024-03-27"),
+    datetime(year: 2024, month: 03, day: 27),
+  )
+}
