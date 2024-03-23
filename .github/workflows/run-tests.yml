@@ -28,3 +28,9 @@ jobs:
 
       - name: Run tests
         run: make test
+
+      - name: Upload PDF diffs
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-diffs
+          path: diff_*.png
