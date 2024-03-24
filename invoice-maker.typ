@@ -197,6 +197,8 @@
 
   let t = languages.at(language)
   let signature = ""
+  let issuing-date = if issuing-date != none { issuing-date }
+        else { datetime.today().display("[year]-[month]-[day]") }
 
   set document(
     title: title,
@@ -238,9 +240,6 @@
           //   .today()
           //   .display("[year]-[month]-[day]t[hour][minute][second]")
         }
-
-  let issuing-date = if issuing-date != none { issuing-date }
-        else { datetime.today().display("[year]-[month]-[day]") }
 
   let delivery-date = if delivery-date != none { delivery-date }
         else { TODO }
@@ -420,10 +419,8 @@
   if cancellation-id == none {
     let due-date = if due-date != none { due-date }
           else {
-            TODO
-            // TODO: Reactivate after Typst supports adding dates
-            // datetime.today().add(days: 14).
-            //   display("[year]-[month]-[day]")
+            (parse-date(issuing-date) + duration(days: 14))
+              .display("[year]-[month]-[day]")
           }
 
     (t.due-text)(due-date)
