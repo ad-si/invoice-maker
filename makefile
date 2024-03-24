@@ -23,7 +23,8 @@ examples/%.check: examples/%.typ
 		"diff_$*_%d.png"
 	@identify -format "%@" "diff_$*_0.png" \
 	2>&1 | grep -q 'not contain' \
-	&& echo "✅" || echo "❌: examples/$*.pdf changed -> diff_$*_0.png"
+	&& (echo "✅"; exit 0) \
+	|| (echo "❌: examples/$*.pdf changed -> diff_$*_0.png"; exit 1)
 
 
 template/main.pdf: template/main-local.typ invoice-maker.typ
