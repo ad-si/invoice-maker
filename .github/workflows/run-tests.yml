@@ -17,6 +17,9 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install font "Liberation Sans"
+        run: sudo apt-get install fonts-liberation
+
       - name: Install Typst
         run: cargo install typst-cli
 

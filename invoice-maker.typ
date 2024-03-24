@@ -51,7 +51,7 @@
   fill: rgb(255,180,170),
 )[
   #text(
-    font: "Arial",
+    font: "Liberation Sans",
     size: 8pt,
     weight: 600,
     fill: rgb(100,68,64)
@@ -154,7 +154,7 @@
   keywords: (),
   hourly-rate: none,
   styling: (
-    font: "Arial",
+    font: "Liberation Sans",
     fontsize: 11pt,
     margin: (
       top: 20mm,
