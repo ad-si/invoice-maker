@@ -7,7 +7,7 @@ discount:
   value: 0.15
   type: proportionate
   reason: Coupon
-vat: 0.15
+vat: 0.19
 hourly-rate: 100
 
 biller:

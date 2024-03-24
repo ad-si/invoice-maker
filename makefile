@@ -10,7 +10,10 @@ unit-tests:
 
 examples/%.check: examples/%.typ
 	@typst compile --root="." $<
-	@printf "Compare '%s.pdf' to expected output " "$(basename $<)"
+	@printf \
+		"Compare '%s.pdf' to expected output '%s' " \
+		"$(basename $<)" \
+		"fixtures/expected-$*.pdf"
 	@magick "$(basename $<).pdf" \
 		null: "fixtures/expected-$*.pdf" \
 		-compose difference \
@@ -34,10 +37,13 @@ template/main-local.typ: template/main.typ
 .PHONY: test
 test: \
 	unit-tests \
+	examples/minimal-data.check \
 	examples/en.check \
 	examples/de.check \
-	examples/load-yaml.check \
 	examples/with-body.check \
+	examples/discount-fixed.typ \
+	examples/discount-proportionate.typ \
+	examples/load-yaml.check \
 	template/main.pdf
 
 

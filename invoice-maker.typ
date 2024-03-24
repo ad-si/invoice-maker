@@ -355,17 +355,24 @@
 
   let discount-value = if discount == none { 0 }
     else {
-      if (discount.type == "fixed") {
-        discount.value
-      }
+      if (discount.type == "fixed") { discount.value }
       else if discount.type == "proportionate" {
         sub-total * discount.value
       }
-      else {
-        panic(["#discount.type" is no valid discount type])
-      }
+      else { panic(["#discount.type" is no valid discount type]) }
     }
-  let tax = sub-total * vat
+  let discount-label = if discount == none { 0 }
+    else {
+      if (discount.type == "fixed") { str(discount.value) + " €" }
+      else if discount.type == "proportionate" {
+        str(discount.value * 100) + " %"
+      }
+      else { panic(["#discount.type" is no valid discount type]) }
+    }
+  let has-reverse-charge = {
+        biller.vat-id.slice(0, 2) != recipient.vat-id.slice(0, 2)
+      }
+  let tax = if has-reverse-charge { 0 } else { sub-total * vat }
   let total = sub-total - discount-value + tax
 
   let table-entries = (
@@ -378,17 +385,17 @@
     },
     if discount-value != 0 {
       (
-        [Discount of #discount-value
-          #{if discount.reason != "" { discount.reason }}],
-        [#{nbh}#add-zeros(cancel-neg * discount.value)  €]
+        [Discount of #discount-label
+          #{if discount.reason != "" { "(" + discount.reason + ")" }}],
+        [-#add-zeros(cancel-neg * discount-value) €]
       )
     },
-    if recipient.vat-id.starts-with("DE") and (vat != 0) {
+    if not has-reverse-charge and (vat != 0) {
       ([#t.vat #{vat * 100} %:],
         [#{add-zeros(cancel-neg * tax)} €]
       )
     },
-    if (not recipient.vat-id.starts-with("DE")) {
+    if (has-reverse-charge) {
       ([#t.vat:], text(0.9em)[#t.reverse-charge])
     },
     (
