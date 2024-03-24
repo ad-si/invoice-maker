@@ -13,8 +13,8 @@
   recipient: recipient,
   items: table-data,
   styling: (
-    font: "Courier New",
-    fontsize: 8pt,
+    font: none, // Explicitly use Typst's default font
+    font-size: 8pt,
     margin: (
       top: 20mm,
       right: 40mm,
@@ -27,6 +27,7 @@
 #horizontalrule
 
 = Additional Information
+#v(1em)
 
 The body of the invoice can contain additional information,
 such as a note to the recipient

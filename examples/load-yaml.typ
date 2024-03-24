@@ -4,4 +4,5 @@
 #show: invoice.with(
   banner-image: image("../fixtures/banner.png"),
   data: yaml("../fixtures/example-data.yaml"),
+  styling: ( font: none ), // Explicitly use Typst's default font
 )

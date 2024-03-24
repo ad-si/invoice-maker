@@ -14,4 +14,5 @@
   hourly-rate: 100,
   recipient: recipient,
   items: table-data,
+  styling: ( font: none ), // Explicitly use Typst's default font
 )

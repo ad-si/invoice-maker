@@ -29,5 +29,6 @@
       description: "Minimal amount of work",
       price: 1,
     ),
-  )
+  ),
+  styling: ( font: none ), // Explicitly use Typst's default font
 )

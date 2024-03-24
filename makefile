@@ -14,7 +14,9 @@ examples/%.check: examples/%.typ
 		"Compare '%s.pdf' to expected output '%s' " \
 		"$(basename $<)" \
 		"fixtures/expected-$*.pdf"
-	@magick "$(basename $<).pdf" \
+	@magick \
+		-density 150 \
+		"$(basename $<).pdf" \
 		null: "fixtures/expected-$*.pdf" \
 		-compose difference \
 		-layers composite \

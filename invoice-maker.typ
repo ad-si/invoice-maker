@@ -51,8 +51,7 @@
   fill: rgb(255,180,170),
 )[
   #text(
-    font: "Liberation Sans",
-    size: 8pt,
+    size: 0.8em,
     weight: 600,
     fill: rgb(100,68,64)
   )[TODO]
@@ -149,26 +148,27 @@
   issuing-date: none,
   delivery-date: none,
   due-date: none,
-  biller: (),
-  recipient: (),
+  biller: (:),
+  recipient: (:),
   keywords: (),
   hourly-rate: none,
-  styling: (
-    font: "Liberation Sans",
-    fontsize: 11pt,
-    margin: (
-      top: 20mm,
-      right: 25mm,
-      bottom: 20mm,
-      left: 25mm
-    ),
-  ),
+  styling: (:), // font, font-size, margin (sets defaults below)
   items: (),
   discount: none,
   vat: 0.19,
   data: none,
   doc,
 ) = {
+  // Set styling defaults
+  styling.font = styling.at("font", default: "Liberation Sans")
+  styling.font-size = styling.at("font-size", default: 11pt)
+  styling.margin = styling.at("margin", default: (
+    top: 20mm,
+    right: 25mm,
+    bottom: 20mm,
+    left: 25mm,
+  ))
+
   if data != none {
     language = data.at("language", default: language)
     country = data.at("country", default: languages.at(language).country)
@@ -212,8 +212,8 @@
   set par(justify: true)
   set text(
     lang: language,
-    font: styling.font,
-    size: styling.fontsize,
+    font: if styling.font != none { styling.font } else { () },
+    size: styling.font-size,
   )
   set table(stroke: none)
 
@@ -221,7 +221,7 @@
   [#pad(top: -20mm, banner-image)]
 
   align(center)[#block(inset: 2em)[
-    #text(font: "Arial", weight: "bold", size: 2em)[
+    #text(weight: "bold", size: 2em)[
       #(if title != none { title } else {
         if cancellation-id != none { t.cancellation-invoice }
         else { t.invoice }
