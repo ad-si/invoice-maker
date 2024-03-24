@@ -47,6 +47,7 @@ test: \
 	examples/discount-fixed.typ \
 	examples/discount-proportionate.typ \
 	examples/load-yaml.check \
+	examples/custom-language.check \
 	template/main.pdf
 
 

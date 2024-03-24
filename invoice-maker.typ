@@ -75,6 +75,7 @@
 
 #let languages = (
     en: (
+      id: "en",
       country: "GB",
       recipient: "Recipient",
       biller: "Biller",
@@ -97,6 +98,7 @@
       price: "Price",
       total-time: "Total working time",
       subtotal: "Subtotal",
+      discount-of: "Discount of",
       vat: "VAT of",
       reverse-charge: "Reverse Charge",
       total: "Total",
@@ -106,6 +108,7 @@
       iban: "IBAN",
     ),
     de: (
+      id: "de",
       country: "DE",
       recipient: "Empfänger",
       biller: "Aussteller",
@@ -128,6 +131,7 @@
       price: "Preis",
       total-time: "Gesamtarbeitszeit",
       subtotal: "Zwischensumme",
+      discount-of: "Rabatt von",
       vat: "Umsatzsteuer von",
       reverse-charge: "Steuerschuldnerschaft des\nLeistungsempfängers",
       total: "Gesamt",
@@ -169,9 +173,18 @@
     left: 25mm,
   ))
 
+  language = if data != none {
+    data.at("language", default: language)
+  } else { language }
+
+  // Translations
+  let t = if type(language) == str { languages.at(language) }
+          else if type(language) == dictionary { language }
+          else { panic("Language must be either a string or a dictionary.") }
+
   if data != none {
     language = data.at("language", default: language)
-    country = data.at("country", default: languages.at(language).country)
+    country = data.at("country", default: t.country)
     title = data.at("title", default: title)
     banner-image = data.at("banner-image", default: banner-image)
     invoice-id = data.at("invoice-id", default: invoice-id)
@@ -195,7 +208,6 @@
     message: "Invalid IBAN " + biller.iban + " for country " + country
   )
 
-  let t = languages.at(language)
   let signature = ""
   let issuing-date = if issuing-date != none { issuing-date }
         else { datetime.today().display("[year]-[month]-[day]") }
@@ -211,7 +223,7 @@
   )
   set par(justify: true)
   set text(
-    lang: language,
+    lang: t.id,
     font: if styling.font != none { styling.font } else { () },
     size: styling.font-size,
   )
@@ -385,7 +397,7 @@
     },
     if discount-value != 0 {
       (
-        [Discount of #discount-label
+        [#t.discount-of #discount-label
           #{if discount.reason != "" { "(" + discount.reason + ")" }}],
         [-#add-zeros(cancel-neg * discount-value) €]
       )
