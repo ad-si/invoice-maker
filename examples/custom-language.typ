@@ -2,6 +2,7 @@
 
 #show: invoice.with(
   hourly-rate: 1,
+  issuing-date: "2024-03-24", // Must be set to not break tests
   language: (
     id: "es",
     country: "ES",
