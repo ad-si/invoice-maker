@@ -1,4 +1,4 @@
-#import "@preview/invoice-maker:1.0.0": *
+#import "@preview/invoice-maker:1.1.0": *
 
 #show: invoice.with(
   language: "en", // or "de"

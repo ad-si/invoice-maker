@@ -1,1 +1,1 @@
-typescript_pandoc -linguist-detectable
+typescript_pandoc/** -linguist-detectable
