@@ -1,4 +1,5 @@
 #let nbh = "‑"
+#let currency = "GBP"
 
 // Truncate a number to 2 decimal places
 // and add trailing zeros if necessary
@@ -100,6 +101,7 @@
       subtotal: "Subtotal",
       discount-of: "Discount of",
       vat: "VAT of",
+      no-vat: "Not Subject to VAT",
       reverse-charge: "Reverse Charge",
       total: "Total",
       due-text: val =>
@@ -133,6 +135,7 @@
       subtotal: "Zwischensumme",
       discount-of: "Rabatt von",
       vat: "Umsatzsteuer von",
+      no-vat: "Nicht Umsatzsteuerpflichtig",
       reverse-charge: "Steuerschuldnerschaft des\nLeistungsempfängers",
       total: "Gesamt",
       due-text: val =>
@@ -269,14 +272,16 @@
 
   v(2em)
 
-  box(height: 10em)[
+  box(height: 12em)[
     #columns(2, gutter: 4em)[
       === #t.recipient
       #v(0.5em)
       #recipient.name \
       #{if "title" in recipient { [#recipient.title \ ] }}
-      #recipient.address.city #recipient.address.postal-code \
       #recipient.address.street \
+      #{if " " in recipient.address.postal-code { [#recipient.address.city\
+           #recipient.address.postal-code \ ] } else {[#recipient.address.postal-code #recipient.address.city \ ] }}
+      #recipient.address.country \
       #{if recipient.vat-id.starts-with("DE"){"USt-IdNr.:"}}
         #recipient.vat-id
 
@@ -285,8 +290,10 @@
       #v(0.5em)
       #biller.name \
       #{if "title" in biller { [#biller.title \ ] }}
-      #biller.address.city #biller.address.postal-code \
       #biller.address.street \
+     #{if " " in biller.address.postal-code { [#biller.address.city\
+           #biller.address.postal-code \ ] } else {[#biller.address.postal-code #biller.address.city \ ] }}
+      #biller.address.country \
       #{if biller.vat-id.starts-with("DE"){"USt-IdNr.:"}}
         #biller.vat-id
     ]
@@ -330,8 +337,8 @@
       [*#t.description*],
       [*#t.duration*\ #text(size: 0.8em)[( min )]],
       [*#t.quantity*],
-      [*#t.price*\ #text(size: 0.8em)[( € )]],
-      [*#t.total*\ #text(size: 0.8em)[( € )]],
+      [*#t.price*\ #text(size: 0.8em)[( #currency )]],
+      [*#t.total*\ #text(size: 0.8em)[( #currency )]],
       table.hline(stroke: 0.5pt),
     ),
     ..items
@@ -375,7 +382,7 @@
     }
   let discount-label = if discount == none { 0 }
     else {
-      if (discount.type == "fixed") { str(discount.value) + " €" }
+      if (discount.type == "fixed") { str(discount.value) + " " + currency }
       else if discount.type == "proportionate" {
         str(discount.value * 100) + " %"
       }
@@ -393,26 +400,27 @@
     },
     if (discount-value != 0) or (vat != 0) {
       ([#t.subtotal:],
-      [#{add-zeros(cancel-neg * sub-total)} €])
+      [#{add-zeros(cancel-neg * sub-total)} #currency])
     },
     if discount-value != 0 {
       (
         [#t.discount-of #discount-label
           #{if discount.reason != "" { "(" + discount.reason + ")" }}],
-        [-#add-zeros(cancel-neg * discount-value) €]
+        [-#add-zeros(cancel-neg * discount-value) #currency]
       )
     },
     if not has-reverse-charge and (vat != 0) {
       ([#t.vat #{vat * 100} %:],
-        [#{add-zeros(cancel-neg * tax)} €]
+        [#{add-zeros(cancel-neg * tax)} #currency]
       )
     },
+    if (vat == 0) {([#t.no-vat], [ ])},
     if (has-reverse-charge) {
       ([#t.vat:], text(0.9em)[#t.reverse-charge])
     },
     (
       [*#t.total*:],
-      [*#add-zeros(cancel-neg * total) €*]
+      [*#add-zeros(cancel-neg * total) #currency*]
     ),
   )
   .filter(entry => entry != none)
