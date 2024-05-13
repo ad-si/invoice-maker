@@ -1,5 +1,4 @@
 #let nbh = "‑"
-#let currency = "GBP"
 
 // Truncate a number to 2 decimal places
 // and add trailing zeros if necessary
@@ -147,6 +146,7 @@
 
 #let invoice(
   language: "en",
+  currency: "€",
   country: none,
   title: none,
   banner-image: none,
@@ -187,6 +187,7 @@
 
   if data != none {
     language = data.at("language", default: language)
+    currency = data.at("currency", default: currency)
     country = data.at("country", default: t.country)
     title = data.at("title", default: title)
     banner-image = data.at("banner-image", default: banner-image)
