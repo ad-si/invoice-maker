@@ -164,6 +164,7 @@
   discount: none,
   vat: 0.19,
   data: none,
+  override-t: none,
   doc,
 ) = {
   // Set styling defaults
@@ -184,6 +185,15 @@
   let t = if type(language) == str { languages.at(language) }
           else if type(language) == dictionary { language }
           else { panic("Language must be either a string or a dictionary.") }
+
+  // override parts of translation, e.g. change word "Invoice" into "Quote"
+  if override-t != none {
+    for k in t.keys() {
+      if override-t.at(k, default: none) != none {
+        t.insert(k, override-t.at(k))
+      }
+    }
+  }
 
   if data != none {
     language = data.at("language", default: language)
