@@ -385,7 +385,7 @@
   let has-reverse-charge = {
         (biller.vat-id != recipient.vat-id and not charge-vat-even-if-reverse-charge)
       }
-  let tax = if  has-reverse-charge {0} else { sub-total * vat }
+  let tax = if has-reverse-charge { 0 } else { sub-total * vat }
   let total = sub-total - discount-value + tax
 
   let table-entries = (
@@ -408,7 +408,7 @@
         [#{add-zeros(cancel-neg * tax)} €]
       )
     },
-    if (has-reverse-charge ) {
+    if (has-reverse-charge) {
       ([#t.vat:], text(0.9em)[#t.reverse-charge])
     },
     (
