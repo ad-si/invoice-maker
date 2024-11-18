@@ -164,7 +164,7 @@
   discount: none,
   vat: 0.19,
   data: none,
-  override-t: none,
+  override-translation: none,
   doc,
 ) = {
   // Set styling defaults
@@ -187,10 +187,10 @@
           else { panic("Language must be either a string or a dictionary.") }
 
   // override parts of translation, e.g. change word "Invoice" into "Quote"
-  if override-t != none {
+  if override-translation != none {
     for k in t.keys() {
-      if override-t.at(k, default: none) != none {
-        t.insert(k, override-t.at(k))
+      if override-translation.at(k, default: none) != none {
+        t.insert(k, override-translation.at(k))
       }
     }
   }
@@ -289,22 +289,19 @@
       #v(0.5em)
       #recipient.name \
       #{if "title" in recipient { [#recipient.title \ ] }}
+      #{if "country" in recipient.address { [#recipient.address.country \ ] }}
+      #recipient.address.city #recipient.address.postal-code \
       #recipient.address.street \
-      #{if " " in recipient.address.postal-code { [#recipient.address.city\
-           #recipient.address.postal-code \ ] } else {[#recipient.address.postal-code #recipient.address.city \ ] }}
-      #recipient.address.country \
       #{if recipient.vat-id.starts-with("DE"){"USt-IdNr.:"}}
         #recipient.vat-id
-
 
       === #t.biller
       #v(0.5em)
       #biller.name \
       #{if "title" in biller { [#biller.title \ ] }}
+      #{if "country" in biller.address { [#biller.address.country \ ] }}
+      #biller.address.city #biller.address.postal-code \
       #biller.address.street \
-     #{if " " in biller.address.postal-code { [#biller.address.city\
-           #biller.address.postal-code \ ] } else {[#biller.address.postal-code #biller.address.city \ ] }}
-      #biller.address.country \
       #{if biller.vat-id.starts-with("DE"){"USt-IdNr.:"}}
         #biller.vat-id
     ]
