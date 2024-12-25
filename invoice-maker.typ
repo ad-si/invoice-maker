@@ -291,7 +291,7 @@
       #{if "title" in recipient { [#recipient.title \ ] }}
       #{if "country" in recipient.address { [#recipient.address.country \ ] }}
       #recipient.address.city #recipient.address.postal-code \
-      #recipient.address.street \
+      #recipient.address.street #recipient.address.number \
       #{if recipient.vat-id.starts-with("DE"){"USt-IdNr.:"}}
         #recipient.vat-id
 
@@ -301,7 +301,7 @@
       #{if "title" in biller { [#biller.title \ ] }}
       #{if "country" in biller.address { [#biller.address.country \ ] }}
       #biller.address.city #biller.address.postal-code \
-      #biller.address.street \
+      #biller.address.street #biller.address.number \
       #{if biller.vat-id.starts-with("DE"){"USt-IdNr.:"}}
         #biller.vat-id
     ]
