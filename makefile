@@ -42,6 +42,7 @@ test: \
 	unit-tests \
 	examples/minimal-data.check \
 	examples/en.check \
+	examples/fr.check \
 	examples/de.check \
 	examples/with-body.check \
 	examples/discount-fixed.typ \
