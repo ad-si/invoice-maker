@@ -16,6 +16,9 @@
         DE: regex(
           "^DE[a-zA-Z0-9]{2}\s?([0-9]{4}\s?){4}([0-9]{2})$"
         ),
+        FR: regex(
+          "^FR[a-zA-Z0-9]{2}\s?([0-9]{4}\s?){5}([0-9]{3})$"
+        ),
         GB: regex(
           "^GB[a-zA-Z0-9]{2}\s?([a-zA-Z]{4}\s?){1}([0-9]{4}\s?){3}([0-9]{2})$"
         ),
@@ -106,6 +109,40 @@
       due-text: val =>
         [Please transfer the money onto following bank account due to *#val*:],
       owner: "Owner",
+      iban: "IBAN",
+    ),
+    fr: (
+      id: "fr",
+      country: "FR",
+      recipient: "Destinataire",
+      biller: "Émetteur",
+      invoice: "Facture",
+      cancellation-invoice: "Annulation de facture",
+      cancellation-notice: (id, issuing-date) => [
+        Comme convenu, voust recevrez un crédit
+        pour la facture *#id* du *#issuing-date*.
+      ],
+      invoice-id: "Facture N°",
+      issuing-date: "Date d’émission",
+      delivery-date: "Date de livraison",
+      items: "Produits",
+      closing: "Merci !",
+      number: "N°",
+      date: "Date",
+      description: "Description",
+      duration: "Durée",
+      quantity: "Quantité",
+      price: "Prix",
+      total-time: "Temps total travaillé",
+      subtotal: "Sous-total",
+      discount-of: "Remise de",
+      vat: "TVA",
+      no-vat: "Non sujet à la TVA",
+      reverse-charge: "Facturation inversée",
+      total: "Total",
+      due-text: val =>
+        [Merci de régler d’ici le *#val* par virement au compte bancaire suivant:],
+      owner: "Titulaire",
       iban: "IBAN",
     ),
     de: (
