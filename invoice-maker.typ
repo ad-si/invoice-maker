@@ -275,7 +275,7 @@
   set par(justify: true)
   set text(
     lang: t.id,
-    font: if styling.font != none { styling.font } else { () },
+    font: if styling.font == none { "libertinus serif" } else { styling.font },
     size: styling.font-size,
   )
   set table(stroke: none)
