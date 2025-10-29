@@ -161,7 +161,7 @@
   discount: none,
   vat: 0.19,
   data: none,
-  charge-vat-even-if-reverse-charge: false,
+  vat-always: false, // Always charge VAT (even if reverse charge applies)
   doc,
 ) = {
   // Set styling defaults
@@ -383,7 +383,7 @@
       else { panic(["#discount.type" is no valid discount type]) }
     }
   let has-reverse-charge = {
-        (biller.vat-id != recipient.vat-id and not charge-vat-even-if-reverse-charge)
+        (biller.vat-id.slice(0, 2) != recipient.vat-id.slice(0, 2)) and not vat-always
       }
   let tax = if has-reverse-charge { 0 } else { sub-total * vat }
   let total = sub-total - discount-value + tax
