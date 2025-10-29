@@ -18,7 +18,7 @@ Generate beautiful invoices from a simple data record.
     - No need to install anything but [Typst]
     - Support for cancellations, discounts, and taxes
 - **Multilingual**
-    - Integrated support for English and German
+    - Integrated support for English, French, and German
     - Easy to add more languages by adding a translation dictionary
         (Check out this example:
         [custom-language.typ](./examples/custom-language.typ))
@@ -42,6 +42,7 @@ Generate beautiful invoices from a simple data record.
 1. Create a new `invoice.typ` file.
     E.g. based on one of the examples below:
     - [English example](./examples/en.typ)
+    - [French example](./examples/fr.typ)
     - [German example](./examples/de.typ)
     - [YAML example](./examples/load-yaml.typ)
 1. Run typst to generate the invoice:
