@@ -92,7 +92,7 @@
       issuing-date: "Issuing Date",
       delivery-date: "Delivery Date",
       items: "Items",
-      closing: "Thank you for the good cooperation!",
+      closing: "Thank you for your business!",
       number: "№",
       date: "Date",
       description: "Description",
