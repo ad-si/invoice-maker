@@ -52,8 +52,8 @@ test: \
 	template/main.pdf
 
 
-examples/en.pdf: examples/en.typ
-	typst compile $<
+examples/%.pdf: examples/%.typ
+	typst compile --root="." $<
 
 
 images/example-invoice.png: examples/en.pdf

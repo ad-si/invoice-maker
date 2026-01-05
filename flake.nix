@@ -20,7 +20,9 @@
           buildInputs = with pkgs; [
             bash
             coreutils
+            ghostscript_headless
             gnumake
+            imagemagick
             liberation_ttf
             typst
           ];
