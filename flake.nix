@@ -24,6 +24,7 @@
             gnumake
             imagemagick
             liberation_ttf
+            poppler-utils
             typst
           ];
         };

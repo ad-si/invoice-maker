@@ -11,20 +11,17 @@ unit-tests:
 examples/%.check: examples/%.typ
 	@typst compile --root="." $<
 	@printf \
-		"Compare '%s.pdf' to expected output '%s' " \
-		"$(basename $<)" \
-		"fixtures/expected-$*.pdf"
-	@magick \
-		-density 150 \
+		"Compare '%s' to expected output '%s' " \
 		"$(basename $<).pdf" \
-		null: "fixtures/expected-$*.pdf" \
-		-compose difference \
-		-layers composite \
-		"diff_$*_%d.png"
-	@identify -format "%@" "diff_$*_0.png" \
-	2>&1 | grep -q 'not contain' \
+		"fixtures/expected-$*.pdf"
+	@pdftotext "$(basename $<).pdf" - \
+		| awk '{$$1=$$1};NF' > "/tmp/actual-$*.txt"
+	@pdftotext "fixtures/expected-$*.pdf" - \
+		| awk '{$$1=$$1};NF' > "/tmp/expected-$*.txt"
+	@diff -q "/tmp/actual-$*.txt" "/tmp/expected-$*.txt" > /dev/null \
 	&& (echo "✅"; exit 0) \
-	|| (echo "❌: examples/$*.pdf changed -> diff_$*_0.png"; exit 1)
+	|| (echo "❌: examples/$*.pdf text differs from fixture"; \
+		diff "/tmp/expected-$*.txt" "/tmp/actual-$*.txt"; exit 1)
 
 
 template/main.pdf: template/main-local.typ invoice-maker.typ
