@@ -24,6 +24,23 @@ examples/%.check: examples/%.typ
 		diff "/tmp/expected-$*.txt" "/tmp/actual-$*.txt"; exit 1)
 
 
+examples/%.html.check: examples/%.typ fixtures/expected-%.html
+	@typst compile \
+		--features html \
+		--format html \
+		--input invoice-format=html \
+		--root="." \
+		$< "$(basename $<).html"
+	@printf \
+		"Compare '%s' to expected output '%s' " \
+		"$(basename $<).html" \
+		"fixtures/expected-$*.html"
+	@diff -q "$(basename $<).html" "fixtures/expected-$*.html" > /dev/null \
+	&& (echo "✅"; exit 0) \
+	|| (echo "❌: examples/$*.html differs from fixture"; \
+		diff "fixtures/expected-$*.html" "$(basename $<).html"; exit 1)
+
+
 template/main.pdf: template/main-local.typ invoice-maker.typ
 	typst compile --root='.' $< $@
 
@@ -46,6 +63,8 @@ test: \
 	examples/discount-proportionate.typ \
 	examples/load-yaml.check \
 	examples/custom-language.check \
+	examples/minimal-data.html.check \
+	examples/en.html.check \
 	template/main.pdf
 
 
@@ -71,3 +90,4 @@ images/example-invoice-hq.png: examples/en.pdf
 clean:
 	rm -f diff_*.png
 	rm -f examples/*.pdf
+	rm -f examples/*.html

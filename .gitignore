@@ -1,4 +1,6 @@
 /*.pdf
+/*.html
 /diff_*.png
 /examples/*.pdf
+/examples/*.html
 .direnv

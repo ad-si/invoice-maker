@@ -52,6 +52,19 @@ Generate beautiful invoices from a simple data record.
 1. Use the generated `invoice.pdf` file 🎉
 
 
+### HTML Export
+
+Invoice Maker can also be exported as HTML. Either set the
+`target: "html"` parameter on `invoice.with(...)`, or pass
+`--input invoice-format=html` on the command line:
+
+```sh
+typst compile --features html --format html \
+  --input invoice-format=html \
+  invoice.typ
+```
+
+
 ## Development
 
 Run Tests:

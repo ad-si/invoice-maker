@@ -203,8 +203,44 @@
   vat-always: false, // Always charge VAT (even if reverse charge applies)
   data: none,
   override-translation: none,
+  // "pdf", "html", or auto (detected from --input invoice-format=html)
+  target: auto,
   doc,
 ) = {
+  let is-html = if target == auto {
+    sys.inputs.at("invoice-format", default: "pdf") == "html"
+  } else { target == "html" }
+
+  // In HTML mode these become identity wrappers — set page, align, box,
+  // columns, pad, v, and block are not allowed inside containers when
+  // exporting to HTML.
+  let center-block = if is-html { it => it } else { it => align(center, it) }
+  let align-with = if is-html {
+    (alignment, body) => body
+  } else {
+    (alignment, body) => align(alignment, body)
+  }
+  let v-space = if is-html { _ => [] } else { v }
+  let pad-with = if is-html {
+    (..args, body) => body
+  } else {
+    (..args, body) => pad(..args, body)
+  }
+  let box-with = if is-html {
+    (..args, body) => body
+  } else {
+    (..args, body) => box(..args, body)
+  }
+  let block-with = if is-html {
+    (..args, body) => body
+  } else {
+    (..args, body) => block(..args, body)
+  }
+  let columns-with = if is-html {
+    (count, ..args, body) => body
+  } else {
+    (count, ..args, body) => columns(count, ..args, body)
+  }
   // Set styling defaults
   styling.font = styling.at("font", default: "Liberation Sans")
   styling.font-size = styling.at("font-size", default: 11pt)
@@ -269,10 +305,12 @@
     keywords: keywords,
     date: parse-date(issuing-date),
   )
-  set page(
-    margin: styling.margin,
-    numbering: none,
-  )
+  if not is-html {
+    set page(
+      margin: styling.margin,
+      numbering: none,
+    )
+  }
   set par(justify: true)
   set text(
     lang: t.id,
@@ -282,16 +320,16 @@
   set table(stroke: none)
 
   // Offset page top margin for banner image
-  [#pad(top: -20mm, banner-image)]
+  [#pad-with(top: -20mm, banner-image)]
 
-  align(center)[#block(inset: 2em)[
+  center-block(block-with(inset: 2em)[
     #text(weight: "bold", size: 2em)[
       #(if title != none { title } else {
         if cancellation-id != none { t.cancellation-invoice }
         else { t.invoice }
       })
     ]
-  ]]
+  ])
 
   let invoice-id-norm = if invoice-id != none {
           if cancellation-id != none { cancellation-id }
@@ -308,7 +346,7 @@
   let delivery-date = if delivery-date != none { delivery-date }
         else { TODO }
 
-  align(center,
+  center-block(
     table(
       columns: 2,
       align: (right, left),
@@ -319,12 +357,12 @@
     )
   )
 
-  v(2em)
+  v-space(2em)
 
-  box(height: 12em)[
-    #columns(2, gutter: 4em)[
+  box-with(height: 12em)[
+    #columns-with(2, gutter: 4em)[
       === #t.recipient
-      #v(0.5em)
+      #v-space(0.5em)
       #recipient.name \
       #{if "title" in recipient { [#recipient.title \ ] }}
       #{if "country" in recipient.address { [#recipient.address.country \ ] }}
@@ -334,7 +372,7 @@
         #recipient.vat-id
 
       === #t.biller
-      #v(0.5em)
+      #v-space(0.5em)
       #biller.name \
       #{if "title" in biller { [#biller.title \ ] }}
       #{if "country" in biller.address { [#biller.address.country \ ] }}
@@ -351,7 +389,7 @@
 
   [== #t.items]
 
-  v(1em)
+  v-space(1em)
 
   let getRowTotal = row => {
     if row.at("dur-min", default: 0) == 0 {
@@ -473,7 +511,7 @@
 
   let grayish = luma(245)
 
-  align(right,
+  align-with(right,
     table(
       columns: 2,
       fill: (col, row) => // if last row
@@ -487,7 +525,7 @@
     )
   )
 
-  v(1em)
+  v-space(1em)
 
   if cancellation-id == none {
     let due-date = if due-date != none { due-date }
@@ -498,8 +536,8 @@
 
     (t.due-text)(due-date)
 
-    v(1em)
-    align(center)[
+    v-space(1em)
+    center-block[
       #table(
         fill: grayish,
         // stroke: 1pt + blue,
@@ -521,13 +559,13 @@
         table.hline(stroke: 0.5pt),
       )
     ]
-    v(1em)
+    v-space(1em)
 
     t.closing
   }
   else {
-    v(1em)
-    align(center, strong(t.closing))
+    v-space(1em)
+    center-block(strong(t.closing))
   }
 
   doc
