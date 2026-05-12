@@ -63,6 +63,7 @@ test: \
 	examples/discount-proportionate.typ \
 	examples/load-yaml.check \
 	examples/custom-language.check \
+	examples/no-vat-id.check \
 	examples/minimal-data.html.check \
 	examples/en.html.check \
 	template/main.pdf

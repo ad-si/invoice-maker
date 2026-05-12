@@ -367,9 +367,12 @@
       #{if "title" in recipient { [#recipient.title \ ] }}
       #{if "country" in recipient.address { [#recipient.address.country \ ] }}
       #recipient.address.city #recipient.address.postal-code \
-      #recipient.address.street \
-      #{if recipient.vat-id.starts-with("DE"){"USt-IdNr.:"}}
-        #recipient.vat-id
+      #recipient.address.street
+      #{if "vat-id" in recipient {
+        linebreak()
+        if recipient.vat-id.starts-with("DE") { "USt-IdNr.: " }
+        recipient.vat-id
+      }}
 
       === #t.biller
       #v-space(0.5em)
@@ -377,9 +380,12 @@
       #{if "title" in biller { [#biller.title \ ] }}
       #{if "country" in biller.address { [#biller.address.country \ ] }}
       #biller.address.city #biller.address.postal-code \
-      #biller.address.street \
-      #{if biller.vat-id.starts-with("DE"){"USt-IdNr.:"}}
-        #biller.vat-id
+      #biller.address.street
+      #{if "vat-id" in biller {
+        linebreak()
+        if biller.vat-id.starts-with("DE") { "USt-IdNr.: " }
+        biller.vat-id
+      }}
     ]
   ]
 
@@ -473,7 +479,18 @@
       else { panic(["#discount.type" is no valid discount type]) }
     }
   let has-reverse-charge = {
-        (biller.vat-id.slice(0, 2) != recipient.vat-id.slice(0, 2)) and not vat-always
+        let biller-prefix = if "vat-id" in biller {
+          biller.vat-id.slice(0, 2)
+        } else { none }
+        let recipient-prefix = if "vat-id" in recipient {
+          recipient.vat-id.slice(0, 2)
+        } else { none }
+        (
+          biller-prefix != none
+            and recipient-prefix != none
+            and biller-prefix != recipient-prefix
+            and not vat-always
+        )
       }
   let tax = if has-reverse-charge { 0 } else { sub-total * vat }
   let total = sub-total - discount-value + tax
