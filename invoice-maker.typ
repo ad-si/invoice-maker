@@ -10,26 +10,105 @@
     str(intp) + "." + (str(decp) + "00").slice(0, 2)
   }
 
-// From https://stackoverflow.com/a/57080936/1850340
-#let verify-iban = (country, iban) => {
-    let iban-regexes = (
-        DE: regex(
-          "^DE[a-zA-Z0-9]{2}\s?([0-9]{4}\s?){4}([0-9]{2})$"
-        ),
-        FR: regex(
-          "^FR[a-zA-Z0-9]{2}\s?([0-9]{4}\s?){5}([0-9]{3})$"
-        ),
-        GB: regex(
-          "^GB[a-zA-Z0-9]{2}\s?([a-zA-Z]{4}\s?){1}([0-9]{4}\s?){3}([0-9]{2})$"
-        ),
-      )
+// IBAN length and BBAN structure per country.
+// Source: SWIFT IBAN Registry. BBAN notation: n = digit, a = A–Z,
+// c = A–Z0–9. Adjacent runs of the same class are collapsed
+// (regex-equivalent to the registry's segmented form).
+#let iban-formats = (
+    AD: (24, "8n12c"),    AE: (23, "19n"),       AL: (28, "8n16c"),
+    AT: (20, "16n"),      AZ: (28, "4a20c"),     BA: (20, "16n"),
+    BE: (16, "12n"),      BG: (22, "4a6n8c"),    BH: (22, "4a14c"),
+    BI: (27, "23n"),      BR: (29, "23n1a1c"),   BY: (28, "4c4n16c"),
+    CH: (21, "5n12c"),    CR: (22, "18n"),       CY: (28, "8n16c"),
+    CZ: (24, "20n"),      DE: (22, "18n"),       DJ: (27, "23n"),
+    DK: (18, "14n"),      DO: (28, "4c20n"),     EE: (20, "16n"),
+    EG: (29, "25n"),      ES: (24, "20n"),       FI: (18, "14n"),
+    FK: (18, "2a12n"),    FO: (18, "14n"),       FR: (27, "10n11c2n"),
+    GB: (22, "4a14n"),    GE: (22, "2a16n"),     GI: (23, "4a15c"),
+    GL: (18, "14n"),      GR: (27, "7n16c"),     GT: (28, "24c"),
+    HN: (28, "4a20n"),    HR: (21, "17n"),       HU: (28, "24n"),
+    IE: (22, "4a14n"),    IL: (23, "19n"),       IQ: (23, "4a15n"),
+    IS: (26, "22n"),      IT: (27, "1a10n12c"),  JO: (30, "4a4n18c"),
+    KW: (30, "4a22c"),    KZ: (20, "3n13c"),     LB: (28, "4n20c"),
+    LC: (32, "4a24c"),    LI: (21, "5n12c"),     LT: (20, "16n"),
+    LU: (20, "3n13c"),    LV: (21, "4a13c"),     LY: (25, "21n"),
+    MC: (27, "10n11c2n"), MD: (24, "20c"),       ME: (22, "18n"),
+    MK: (19, "3n10c2n"),  MN: (20, "16n"),       MR: (27, "23n"),
+    MT: (31, "4a5n18c"),  MU: (30, "4a19n3a"),   NI: (28, "4a20n"),
+    NL: (18, "4a10n"),    NO: (15, "11n"),       OM: (23, "3n16c"),
+    PK: (24, "4a16c"),    PL: (28, "24n"),       PS: (29, "4a21c"),
+    PT: (25, "21n"),      QA: (29, "4a21c"),     RO: (24, "4a16c"),
+    RS: (22, "18n"),      RU: (33, "14n15c"),    SA: (24, "2n18c"),
+    SC: (31, "4a20n3a"),  SD: (18, "14n"),       SE: (24, "20n"),
+    SI: (19, "15n"),      SK: (24, "20n"),       SM: (27, "1a10n12c"),
+    SO: (23, "19n"),      ST: (25, "21n"),       SV: (28, "4a20n"),
+    TL: (23, "19n"),      TN: (24, "20n"),       TR: (26, "5n17c"),
+    UA: (29, "6n19c"),    VA: (22, "18n"),       VG: (24, "4a16n"),
+    XK: (20, "16n"),      YE: (30, "4a4n18c"),
+  )
 
-    if country == none or not country in iban-regexes {
-      true
+// Compile a BBAN format string (e.g. "4a14n") to an anchored regex.
+#let _bban-fmt-to-regex = (fmt) => {
+    let parts = ()
+    let count = ""
+    for c in fmt {
+      let code = c.to-unicode()
+      if code >= 48 and code <= 57 {
+        count += c
+      } else {
+        let cls = if c == "n" { "[0-9]" }
+                  else if c == "a" { "[A-Z]" }
+                  else if c == "c" { "[A-Z0-9]" }
+                  else { panic("Unknown BBAN format spec: " + c) }
+        parts.push(cls + "{" + count + "}")
+        count = ""
+      }
     }
-    else {
-      iban.find(iban-regexes.at(country)) != none
+    "^" + parts.join("") + "$"
+  }
+
+// mod 97 over a digit string, computed incrementally to avoid overflow.
+#let mod-97 = (digits) => {
+    let r = 0
+    for c in digits {
+      r = calc.rem(r * 10 + int(c), 97)
     }
+    r
+  }
+
+// ISO 13616 IBAN validation: country, length, BBAN structure, mod-97 checksum.
+// Returns true for none / empty input (i.e., no IBAN to validate).
+#let verify-iban = (iban) => {
+    if iban == none or iban == "" { return true }
+
+    let normalized = upper(iban).replace(" ", "").replace("-", "")
+
+    if normalized.find(regex("^[A-Z]{2}[0-9]{2}[A-Z0-9]+$")) == none {
+      return false
+    }
+
+    let country = normalized.slice(0, 2)
+    let spec = iban-formats.at(country, default: none)
+    if spec == none { return false }
+
+    let (expected-length, bban-fmt) = spec
+    if normalized.len() != expected-length { return false }
+
+    let bban = normalized.slice(4)
+    if bban.find(regex(_bban-fmt-to-regex(bban-fmt))) == none {
+      return false
+    }
+
+    // Move first 4 chars to end, then expand letters: A=10 … Z=35.
+    let rearranged = bban + normalized.slice(0, 4)
+    let numeric = ""
+    for c in rearranged {
+      let code = c.to-unicode()
+      numeric += if code >= 48 and code <= 57 { c }
+                 else { str(code - 55) }
+    }
+
+    mod-97(numeric) == 1
 }
 
 #let parse-date = (date-str) => {
@@ -292,8 +371,8 @@
 
   // Verify inputs
   assert(
-    verify-iban(country, biller.iban),
-    message: "Invalid IBAN " + biller.iban + " for country " + country
+    verify-iban(biller.iban),
+    message: "Invalid IBAN: " + biller.iban
   )
 
   let signature = ""
