@@ -384,12 +384,11 @@
     keywords: keywords,
     date: parse-date(issuing-date),
   )
-  if not is-html {
-    set page(
-      margin: styling.margin,
-      numbering: none,
-    )
-  }
+
+  // Capture body in a code block so that a conditional `set page` (applied
+  // below) wraps it correctly. A `set page` inside an `if` only affects
+  // content within that `if`-scope, so the body must be rendered inside it.
+  let body = {
   set par(justify: true)
   set text(
     lang: t.id,
@@ -665,4 +664,15 @@
   }
 
   doc
+  }
+
+  if is-html {
+    body
+  } else {
+    set page(
+      margin: styling.margin,
+      numbering: (current, total) => if total > 1 [#current / #total],
+    )
+    body
+  }
 }

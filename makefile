@@ -64,6 +64,7 @@ test: \
 	examples/load-yaml.check \
 	examples/custom-language.check \
 	examples/no-vat-id.check \
+	examples/multi-page.check \
 	examples/minimal-data.html.check \
 	examples/en.html.check \
 	template/main.pdf
